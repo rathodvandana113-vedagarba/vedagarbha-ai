@@ -19,8 +19,10 @@ export async function generateVoice(text: string, voiceId?: string) {
     return {
       success: true,
       data: {
-        audioUrl: "https://actions.google.com/sounds/v1/alarms/beep_short.ogg", // Mock audio
-        text
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", // Mock audio - full sample track
+        text,
+        voiceId: voiceId || "rachel",
+        duration: Math.ceil(text.length / 15),
       }
     };
   }

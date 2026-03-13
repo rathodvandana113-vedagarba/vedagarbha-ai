@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Navbar from '@/components/navbars/KlingNav';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/AuthContext';
@@ -55,6 +55,7 @@ function GeneratePageContent({ type }: { type: string }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [resultData, setResultData] = useState<any>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const resultPanelRef = useRef<HTMLDivElement>(null);
 
   // Settings State
   const [resolution, setResolution] = useState<"HD" | "4K">("HD");
@@ -187,6 +188,10 @@ function GeneratePageContent({ type }: { type: string }) {
           setResultData(data);
           deductCredit(cost);
           addHistoryItem({ ...data.data, cost, type, timestamp: new Date().toISOString() });
+          // Scroll result panel into view on mobile
+          setTimeout(() => {
+            resultPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
         } else {
           alert("Generation Error: " + data.error);
         }
@@ -292,81 +297,83 @@ function GeneratePageContent({ type }: { type: string }) {
             {/* Voice Selection - only for text-to-speech */}
             {type === 'text-to-speech' && (
               <div className="flex flex-col gap-3 mt-4 border-t border-white/5 pt-6">
-                <label className="text-[13px] text-[#A1A1A6] font-medium flex justify-between items-center">
-                  <span>Voice</span>
-                  <span className="text-[11px] text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-0.5 rounded border border-[#D4AF37]/20">
-                    {VOICE_OPTIONS.find(v => v.id === selectedVoice)?.name}
-                  </span>
-                </label>
+                <label className="text-[13px] text-[#A1A1A6] font-medium">Select Voice</label>
 
-                {/* Category Filter */}
-                <div className="flex gap-1.5 flex-wrap">
-                  {["All", "Female", "Male", "Character", "Specialty"].map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => setVoiceFilter(cat)}
-                      className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${
-                        voiceFilter === cat 
-                          ? "bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/40"
-                          : "bg-[#121218] text-[#6E6E73] border border-white/5 hover:text-white hover:bg-white/[0.04]"
-                      }`}
-                    >{cat}</button>
-                  ))}
+                {/* Grouped Dropdown */}
+                <div className="relative">
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="w-full bg-[#121218] border border-white/10 rounded-xl text-white text-sm px-4 py-3 pr-10 outline-none focus:border-[#D4AF37]/50 appearance-none cursor-pointer transition-all"
+                    style={{ colorScheme: 'dark' }}
+                  >
+                    <optgroup label="👩 Female Voices" style={{ background: '#121218' }}>
+                      <option value="21m00Tcm4TlvDq8ikWAM">Rachel — Calm, Natural American</option>
+                      <option value="EXAVITQu4vr4xnSDxMaL">Bella — Soft, Warm &amp; Friendly</option>
+                      <option value="MF3mGyEYCl7XYWbV9V6O">Elli — Young, Expressive</option>
+                      <option value="jBpfAFnaylXS5xSbITun">Freya — Elegant, Refined British</option>
+                      <option value="oWAxZDx7w5VEj9dCyTzz">Grace — Warm, Southern Charm</option>
+                      <option value="pNInz6obpgDQGcFmaJgB">Nicole — Clear &amp; Professional</option>
+                      <option value="XB0fDUnXU5powFXDhCwa">Charlotte — Soothing, Mature</option>
+                      <option value="jsCqWAovK2LkecY7zXl4">Dorothy — Classic British Lady</option>
+                      <option value="ThT5KcBeYPX3keUQqHPh">Lily — Bright Narration</option>
+                      <option value="AZnzlk1XvdvUeBnXmlld">Domi — Confident &amp; Bold</option>
+                      <option value="cgSgspJ2msm6clMCkdW9">Jessica — Bubbly, Cheerful</option>
+                      <option value="FGY2WhTYpPnrIDTdsKH5">Laura — Soothing, Scandinavian</option>
+                      <option value="XrExE9yKIg1WjnnlVkGX">Matilda — Warm Australian</option>
+                      <option value="bVMeCyTHy58xNoL34h3p">Serena — Calm &amp; Composed</option>
+                      <option value="nPczCjzI2devNBz1zQrb">Alice — Confident, British</option>
+                    </optgroup>
+                    <optgroup label="👨 Male Voices" style={{ background: '#121218' }}>
+                      <option value="29vD33N1CtxCmqQRPOHJ">Drew — Deep, Authoritative</option>
+                      <option value="VR6AewLTigWG4xSOukaG">Arnold — Strong, Cinematic</option>
+                      <option value="ErXwobaYiN019PkySvjV">Antoni — Warm, Conversational</option>
+                      <option value="yoZ06aMxZJJ28mfd3POQ">Sam — Smooth Narrator</option>
+                      <option value="TxGEqnHWrfWFTfGW9XjX">Josh — Energetic, Young</option>
+                      <option value="2EiwWnXFnvU5JabPnv8n">Clyde — Powerful, Deep Bass</option>
+                      <option value="ODq5zmih8GrVes37Dizd">Patrick — Charismatic Storyteller</option>
+                      <option value="ZQe5CZNOzWyzPSCn5a3c">James — Smooth British Accent</option>
+                      <option value="N2lVS1w4EtoT3dr4eOWO">Callum — Intense, Dramatic</option>
+                      <option value="CYw3kZ02Hs0563khs1Fj">Dave — British, Casual</option>
+                      <option value="IKne3meq5aSn9XLyUdCD">Charlie — Casual, Natural</option>
+                      <option value="JBFqnCBsd6RMkjVDRZzb">George — Warm Narrator</option>
+                      <option value="TX3LPaxmHKxFdv7VOQHJ">Liam — Articulate, Direct</option>
+                      <option value="bIHbv24MWmeRgasZH58o">Will — Friendly, American</option>
+                      <option value="onwK4e9ZLuTAKqWW03F9">Daniel — Deep, Resonant</option>
+                    </optgroup>
+                    <optgroup label="🎭 Character &amp; Specialty" style={{ background: '#121218' }}>
+                      <option value="GBv7mTt0atIp3Br8iCZE">Thomas — Calm, Wise Elder</option>
+                      <option value="SOYHLrjzK2X1ezoPC6cr">Harry — Lively, Animated</option>
+                      <option value="flq6f7yk4E4fJM5XTYuZ">Michael — Newscast Style</option>
+                      <option value="z9fAnlkpzviPz146aGWa">Glinda — Magical, Whimsical</option>
+                      <option value="t0jbNlBVZ17f02VDIeMI">Jessie — Fast, Energetic</option>
+                      <option value="iP95p4xoKVk53GoZ742B">Giovanni — Refined Italian</option>
+                      <option value="zcAOhNBS3c14rBihAFp1">Giovanni — Wise Storyteller</option>
+                      <option value="g5CIjZEefAph4nQFvHAz">Fin — Upbeat Irish</option>
+                      <option value="jXel5NcKc44aacaKGNgz">Archer — Confident, BBC</option>
+                      <option value="Yko7PKHZNXotIFUBG7I9">Mimi — Childlike Wonder</option>
+                    </optgroup>
+                  </select>
+                  <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#A1A1A6]">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+                  </div>
                 </div>
 
-                {/* Voice Grid */}
-                <div className="flex flex-col gap-1.5 lg:max-h-[260px] max-h-none overflow-y-visible pr-1 lg:overflow-y-auto lg:custom-scrollbar">
-                  {VOICE_OPTIONS
-                    .filter(v => voiceFilter === "All" || v.category === voiceFilter)
-                    .map(voice => (
-                    <button
-                      key={voice.id}
-                      onClick={() => setSelectedVoice(voice.id)}
-                      className={`w-full text-left px-3 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-3 group ${
-                        selectedVoice === voice.id
-                          ? "bg-[#D4AF37]/10 border border-[#D4AF37]/50 shadow-[0_0_12px_rgba(212,175,55,0.15)]"
-                          : "bg-[#121218]/60 border border-white/5 hover:bg-white/[0.04] hover:border-white/10"
-                      }`}
-                    >
-                      {/* Voice Avatar */}
-                      <div 
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-all ${
-                          selectedVoice === voice.id ? "shadow-[0_0_8px_rgba(212,175,55,0.4)]" : ""
-                        }`}
-                        style={{ 
-                          background: `${CATEGORY_COLORS[voice.category]}20`,
-                          color: CATEGORY_COLORS[voice.category],
-                          border: `1px solid ${CATEGORY_COLORS[voice.category]}40`
-                        }}
-                      >
-                        {voice.name.charAt(0)}
+                {/* Selected Voice Preview */}
+                {(() => {
+                  const v = VOICE_OPTIONS.find(v => v.id === selectedVoice);
+                  return v ? (
+                    <div className="flex items-center gap-3 bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-xl px-3 py-2">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                        style={{ background: `${CATEGORY_COLORS[v.category]}20`, color: CATEGORY_COLORS[v.category], border: `1px solid ${CATEGORY_COLORS[v.category]}40` }}
+                      >{v.name.charAt(0)}</div>
+                      <div>
+                        <div className="text-[13px] font-semibold text-[#D4AF37]">{v.name}</div>
+                        <div className="text-[11px] text-[#6E6E73]">{v.desc}</div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[13px] font-semibold truncate ${
-                            selectedVoice === voice.id ? "text-[#D4AF37]" : "text-white"
-                          }`}>{voice.name}</span>
-                          <span 
-                            className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
-                            style={{ 
-                              background: `${CATEGORY_COLORS[voice.category]}15`,
-                              color: CATEGORY_COLORS[voice.category],
-                              border: `1px solid ${CATEGORY_COLORS[voice.category]}25`
-                            }}
-                          >{voice.category}</span>
-                        </div>
-                        <span className="text-[11px] text-[#6E6E73] block truncate">{voice.desc}</span>
-                      </div>
-                      {selectedVoice === voice.id && (
-                        <div className="w-5 h-5 rounded-full bg-[#D4AF37] flex items-center justify-center shrink-0">
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
+                    </div>
+                  ) : null;
+                })()}
               </div>
             )}
             
@@ -404,7 +411,7 @@ function GeneratePageContent({ type }: { type: string }) {
           </div>
         </aside>
 
-        <main className="flex-1 flex flex-col min-h-[45vh] lg:min-h-0 w-full overflow-hidden shrink-0 border-b border-white/5 lg:border-none">
+        <main ref={resultPanelRef} className="flex-1 flex flex-col min-h-[50vh] lg:min-h-0 w-full overflow-hidden shrink-0 border-b border-white/5 lg:border-none">
           <header className="h-[60px] md:h-16 border-b border-white/5 flex justify-between items-center px-3 md:px-6 bg-[#0B0B0F] md:bg-[#0B0B0F]/80 md:backdrop-blur-md gap-2 shrink-0 overflow-hidden w-full relative z-20">
             <div className="flex items-center gap-1 md:gap-4 shrink overflow-hidden">
               <button onClick={() => router.back()} className="text-[#A1A1A6] hover:text-white transition-colors flex items-center justify-center w-8 h-8 rounded-lg md:hover:bg-white/5 shrink-0">

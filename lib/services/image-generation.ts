@@ -16,10 +16,18 @@ export async function generateImage(prompt: string, aspectRatio: string) {
     console.warn("IMAGE_API_KEY is missing. Returning a mock success response.");
     // Simulate API delay
     await new Promise(r => setTimeout(r, 2000));
+    const mockImages = [
+      "https://images.unsplash.com/photo-1682685797886-e46916e8d907?w=1024&q=95",
+      "https://images.unsplash.com/photo-1717501218636-a390f9ac5957?w=1024&q=95",
+      "https://images.unsplash.com/photo-1683009427513-28e163402d16?w=1024&q=95",
+      "https://images.unsplash.com/photo-1699382404367-0e6bb8ff7f7c?w=1024&q=95",
+      "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=1024&q=95",
+    ];
+    const randomImage = mockImages[Math.floor(Math.random() * mockImages.length)];
     return {
       success: true,
       data: {
-        url: "https://via.placeholder.com/1024x576.png?text=Vedagarbha+Mock+Image+Generation",
+        url: randomImage,
         prompt,
         ratio: aspectRatio
       }
