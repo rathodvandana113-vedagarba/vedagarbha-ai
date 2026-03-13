@@ -39,7 +39,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-10">
+        <nav className="desktop-nav items-center gap-10">
           {navLinks.map((link) => (
             <Link 
               key={link.path} 
@@ -60,10 +60,17 @@ const Navbar = () => {
             </span>
             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[240px] bg-[#121218]/95 backdrop-blur-3xl border border-white/10 rounded-2xl p-2 opacity-0 invisible translate-y-2 group-hover/dropdown:opacity-100 group-hover/dropdown:visible group-hover/dropdown:translate-y-0 transition-all duration-300 shadow-2xl">
               {aiFeatures.map((item) => (
-                <Link key={item.path} href={item.path} className="flex items-center gap-3 px-4 py-3.5 text-[#A1A1A6] hover:text-white hover:bg-white/5 rounded-xl transition-all font-bold text-sm">
+                <button 
+                  key={item.path} 
+                  onClick={() => {
+                    if (!user) setIsAuthOpen(true);
+                    else window.location.href = item.path;
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 text-[#A1A1A6] hover:text-white hover:bg-white/5 rounded-xl transition-all font-bold text-sm text-left"
+                >
                   <span className="text-lg">{item.icon}</span>
                   {item.name}
-                </Link>
+                </button>
               ))}
             </div>
           </div>
@@ -108,7 +115,7 @@ const Navbar = () => {
           {/* Hamburger Menu - Improved Style */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5 bg-white/5 border border-white/10 rounded-xl z-[1001]"
+            className="mobile-toggle w-11 h-11 flex flex-col items-center justify-center gap-1.5 bg-white/5 border border-white/10 rounded-xl z-[1001]"
           >
             <span className={`h-0.5 bg-white rounded-full transition-all duration-300 ${isMobileMenuOpen ? 'w-6 rotate-45 translate-y-2' : 'w-6'}`}></span>
             <span className={`h-0.5 bg-white rounded-full transition-all duration-300 ${isMobileMenuOpen ? 'w-0 opacity-0' : 'w-4'}`}></span>
@@ -118,9 +125,9 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Drawer */}
-      <div className={`lg:hidden fixed inset-0 bg-[#0A0A0B] z-[999] transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`mobile-toggle fixed inset-0 bg-[#0A0A0B] z-[999] transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="absolute inset-x-0 top-0 h-[300px] bg-gradient-to-b from-[#D4AF37]/10 to-transparent pointer-events-none"></div>
-        <div className="flex flex-col h-full pt-28 px-6 pb-12 overflow-y-auto">
+        <div className="flex flex-col h-full pt-28 px-6 pb-12 overflow-y-auto w-full">
           <nav className="flex flex-col gap-9">
             <div className="flex flex-col gap-3">
               <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em] mb-2 px-1">Navigation</span>
@@ -143,15 +150,18 @@ const Navbar = () => {
               <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em] mb-2 px-1">AI Features</span>
               <div className="grid grid-cols-1 gap-2">
                 {aiFeatures.map((item) => (
-                  <Link 
+                  <button 
                     key={item.path}
-                    href={item.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-4 p-5 bg-white/[0.03] border border-white/5 rounded-2xl text-[#A1A1A6] hover:text-white transition-all font-bold text-base"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      if (!user) setIsAuthOpen(true);
+                      else window.location.href = item.path;
+                    }}
+                    className="flex items-center gap-4 p-5 bg-white/[0.03] border border-white/5 rounded-2xl text-[#A1A1A6] hover:text-white transition-all font-bold text-base text-left"
                   >
                     <span className="text-2xl">{item.icon}</span>
                     {item.name}
-                  </Link>
+                  </button>
                 ))}
               </div>
             </div>

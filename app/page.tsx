@@ -93,9 +93,16 @@ export default function HomePage() {
               <p className="text-lg md:text-xl text-[#A1A1A6] max-w-[500px] leading-relaxed mx-auto lg:mx-0">
                 Create hyper-realistic videos, images, and voice using AI. The ultimate creative ecosystem inside your browser.
               </p>
-              <div className="flex items-center gap-2 justify-center lg:justify-start">
-                <span className="text-[10px] font-bold text-[#A1A1A6] uppercase tracking-[0.2em]">Powered by</span>
-                <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.2em] px-2 py-0.5 bg-[#D4AF37]/10 rounded border border-[#D4AF37]/20 shadow-[0_0_10px_rgba(212,175,55,0.1)]">webcraft-Ai</span>
+              
+              <div className="flex flex-col gap-2 justify-center lg:justify-start mt-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[#A1A1A6] uppercase tracking-[0.2em] opacity-80">Technology Partner</span>
+                  <div className="h-px w-8 bg-white/10"></div>
+                </div>
+                <div className="flex items-center gap-3 bg-[#D4AF37]/5 px-4 py-3 rounded-2xl border border-[#D4AF37]/20 w-max mx-auto lg:mx-0 shadow-lg backdrop-blur-sm">
+                  <span className="text-[11px] font-bold text-[#A1A1A6] uppercase tracking-[0.2em]">Powered by</span>
+                  <span className="text-[13px] font-black tracking-[0.3em] bg-gradient-to-r from-[#D4AF37] to-[#F5D97A] text-transparent bg-clip-text drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]">WEBCRAFT-AI</span>
+                </div>
               </div>
               <div className="flex flex-col gap-4 mt-4 justify-center lg:justify-start sm:flex-row px-4 sm:px-0">
                 <button 

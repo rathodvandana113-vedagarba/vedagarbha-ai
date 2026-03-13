@@ -171,3 +171,24 @@ h4 {
     display: none;
   }
 }
+
+.desktop-nav {
+  display: none !important;
+}
+
+@media (min-width: 1024px) {
+  .desktop-nav {
+    display: flex !important;
+  }
+}
+
+.mobile-toggle {
+  display: flex !important;
+}
+
+@media (min-width: 1024px) {
+  .mobile-toggle {
+    display: none !important;
+  }
+}
+
