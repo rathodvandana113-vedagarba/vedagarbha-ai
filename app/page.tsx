@@ -88,7 +88,7 @@ export default function HomePage() {
                 <span className="text-[10px] md:text-xs font-semibold tracking-wider text-[#D4AF37] uppercase">Vedagarbha Engine 2.0 Live</span>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-[64px] font-extrabold leading-[1.1] tracking-tight text-white drop-shadow-lg">
-                Vedagarbha AI <span className="bg-gradient-to-br from-[#D4AF37] via-[#F5D97A] to-[#D4AF37] text-transparent bg-clip-text animate-pulse drop-shadow-[0_0_15px_rgba(245,217,122,0.6)]">Platform</span>
+                Vedagarbha AI <span className="bg-gradient-to-br from-[#D4AF37] via-[#F5D97A] to-[#D4AF37] text-transparent bg-clip-text animate-pulse drop-shadow-[0_0_15px_rgba(245,217,122,0.6)]">Platform v3.2</span>
               </h1>
               <p className="text-lg md:text-xl text-[#A1A1A6] max-w-[500px] leading-relaxed mx-auto lg:mx-0">
                 Create hyper-realistic videos, images, and voice using AI. The ultimate creative ecosystem inside your browser.
