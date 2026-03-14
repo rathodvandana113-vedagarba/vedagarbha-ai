@@ -48,7 +48,9 @@ export async function generateImage(prompt: string, aspectRatio: string) {
         prompt: prompt,
         aspect_ratio: aspectRatio || "16:9",
         output_format: "webp",
-        output_quality: 90
+        output_quality: 90,
+        guidance: 3.5,
+        num_inference_steps: 28
       }
     })
   });
