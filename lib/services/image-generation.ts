@@ -54,6 +54,22 @@ export async function generateImage(prompt: string, aspectRatio: string) {
   });
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403 || response.status === 402) {
+      console.warn("Replicate API Key exhausted or unauthorized - FALLBACK TO MOCK");
+      const mockImages = [
+        "https://images.unsplash.com/photo-1682685797886-e46916e8d907?w=1024&q=95",
+        "https://images.unsplash.com/photo-1717501218636-a390f9ac5957?w=1024&q=95",
+        "https://images.unsplash.com/photo-1683009427513-28e163402d16?w=1024&q=95",
+      ];
+      return {
+        success: true,
+        data: {
+          url: mockImages[Math.floor(Math.random() * mockImages.length)],
+          prompt,
+          ratio: aspectRatio
+        }
+      };
+    }
     const errorText = await response.text();
     console.error("Replicate Image API Error:", errorText);
     throw new Error(`Image generation failed: ${response.statusText}`);

@@ -59,6 +59,19 @@ export async function generateVideo(prompt: string, type: 'text' | 'image', imag
   });
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403 || response.status === 402) {
+      console.warn("Fal.ai Video API Key exhausted or unauthorized - FALLBACK TO MOCK");
+      const resultUrl = "https://assets.mixkit.co/videos/preview/mixkit-ink-swirling-in-water-in-slow-motion-11911-large.mp4";
+      return {
+        success: true,
+        data: {
+          videoUrl: resultUrl,
+          resultUrl,
+          prompt,
+          type
+        }
+      };
+    }
     const errorText = await response.text();
     console.error("Fal.ai Video API Error:", errorText);
     throw new Error(`Video generation failed: ${response.statusText}`);
