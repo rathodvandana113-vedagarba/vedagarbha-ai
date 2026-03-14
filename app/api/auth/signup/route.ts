@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     // Create user
     const today = new Date().toISOString().split("T")[0];
-    const user = await prisma.user.create({
+    const user = (await prisma.user.create({
       data: {
         name: name || email.split("@")[0],
         email: email.toLowerCase(),
@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
         dailyFreeCredits: 3,
         lastClaimDate: today,
         studentStatus: "none",
-      },
-    });
+      } as any,
+    })) as any;
 
     return NextResponse.json({
       success: true,
