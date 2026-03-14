@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = (await prisma.user.findUnique({
       where: { email: session.user.email },
       select: {
         id: true,
@@ -21,8 +21,8 @@ export async function GET() {
         dailyFreeCredits: true,
         lastClaimDate: true,
         studentStatus: true,
-      },
-    });
+      } as any,
+    })) as any;
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -33,7 +33,7 @@ export async function GET() {
     if (user.lastClaimDate !== today) {
       await prisma.user.update({
         where: { id: user.id },
-        data: { dailyFreeCredits: 3, lastClaimDate: today },
+        data: { dailyFreeCredits: 3, lastClaimDate: today } as any,
       });
       user.dailyFreeCredits = 3;
       user.lastClaimDate = today;
@@ -72,8 +72,8 @@ export async function PATCH(req: NextRequest) {
         dailyFreeCredits: true,
         lastClaimDate: true,
         studentStatus: true,
-      },
-    });
+      } as any,
+    }) as any;
 
     return NextResponse.json({ user });
   } catch (error: any) {
