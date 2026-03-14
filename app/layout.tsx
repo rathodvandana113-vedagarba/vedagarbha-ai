@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import AnimatedBackground from "@/components/ui/AnimatedBackground";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const space = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
 
 export const metadata: Metadata = {
-  title: "Super AI Builder Ecosystem",
+  title: "Vedagarbha AI — Next-Gen Movie & Image Creation",
   description:
-    "Living AI web ecosystem combining instant generation, autonomous agents, and immersive 3D interactions."
+    "The world's most advanced AI creative ecosystem. Generate cinematic videos, ultra-realistic images, and human-like speech with ease."
 };
 
 export const viewport = {
@@ -18,15 +19,16 @@ export const viewport = {
   userScalable: false,
 };
 
-import { AuthProvider } from "@/lib/contexts/AuthContext";
+import Providers from "@/components/Providers";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${space.variable}`}>
-        <AuthProvider>
+      <body className={`${inter.variable} ${space.variable} antialiased selection:bg-[#3B82F6]/30 selection:text-white`}>
+        <Providers>
+          <AnimatedBackground />
           {children}
-        </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

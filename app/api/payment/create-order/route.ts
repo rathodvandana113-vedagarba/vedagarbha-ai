@@ -15,7 +15,14 @@ export async function POST(req: NextRequest) {
     const order = await createRazorpayOrder(amountInPaise);
     return NextResponse.json({ success: true, order, keyId: process.env.RAZORPAY_KEY_ID });
   } catch (error: any) {
-    console.error("Create Order Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to create order" }, { status: 500 });
+    console.error("[CRITICAL] Create Order Error:", {
+      message: error.message,
+      stack: error.stack,
+      code: error.code
+    });
+    return NextResponse.json({ 
+      error: error.message || "Failed to create order",
+      details: error.description || "Internal Gateway Error"
+    }, { status: 500 });
   }
 }

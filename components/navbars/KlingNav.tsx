@@ -1,81 +1,127 @@
 "use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useAuth } from '@/lib/contexts/AuthContext';
-import AuthModal from '@/components/auth/AuthModal';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/lib/contexts/AuthContext";
+import AuthModal from "@/components/auth/AuthModal";
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const { user, status, logout, setAuthOpen, isAuthOpen } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Pricing', path: '/pricing' },
-    { name: 'Prompt Library', path: '/prompts' },
+    { name: "Dashboard", path: "/dashboard" },
+    { name: "Pricing", path: "/pricing" },
+    { name: "Prompt Library", path: "/prompts" },
   ];
 
   const aiFeatures = [
     { name: "Text to Video", path: "/generate/text-to-video", icon: "🎬" },
     { name: "Image to Video", path: "/generate/image-to-video", icon: "✨" },
     { name: "Text to Image", path: "/generate/text-to-image", icon: "🖼" },
-    { name: "Text to Speech", path: "/generate/text-to-speech", icon: "🎙" }
+    { name: "Text to Speech", path: "/generate/text-to-speech", icon: "🎙" },
   ];
 
+  const router = useRouter();
+
   return (
-    <header className="fixed top-0 left-0 right-0 h-[72px] bg-[#0A0A0B]/90 backdrop-blur-2xl border-b border-white/10 z-[1000] flex items-center">
-      <div className="w-full max-w-[1440px] mx-auto px-4 md:px-8 flex justify-between items-center h-full">
-        {/* Logo */}
-        <div className="flex items-center gap-6 shrink-0 z-[1001]">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#D4AF37] to-[#F5D97A] shadow-[0_0_20px_rgba(212,175,55,0.4)] flex items-center justify-center">
-              <span className="text-black font-black text-sm">V</span>
+    <header
+      className={`fixed top-0 left-0 right-0 h-[70px] sm:h-[80px] z-[1000] flex items-center transition-all duration-500 ${
+        scrolled
+          ? "glass bg-[#020202]/60 border-b border-white/10"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="w-full max-w-[1440px] mx-auto px-4 md:px-12 flex justify-between items-center h-full">
+        {/* Logo Section */}
+        <div className="flex items-center gap-2 sm:gap-8 shrink-0 z-[1001]">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+            <div className="relative w-7 h-7 sm:w-12 sm:h-12 preserve-3d group-hover:rotate-y-12 transition-transform duration-500">
+              <img
+                src="/logo.png"
+                alt="Vedagarbha Logo"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+              />
+              <div className="absolute inset-0 bg-white blur-2xl opacity-10 -z-10 animate-pulse"></div>
             </div>
-            <span className="text-xl md:text-2xl font-black tracking-tight text-white">
-              Vedagarbha
-            </span>
+            <div className="flex flex-col">
+              <span className="text-base sm:text-2xl font-black tracking-tighter text-white group-hover:text-white transition-colors leading-none">
+                VEDAGARBHA
+              </span>
+              <span className="hidden sm:block text-[9px] font-bold text-white/40 tracking-[0.3em] uppercase mt-1 text-nowrap">
+                AI ECOSYSTEM
+              </span>
+            </div>
           </Link>
-          <div className="hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
-             <span className="text-[9px] font-bold text-[#6E6E73] uppercase tracking-[0.2em]">Partner</span>
-             <span className="text-[9px] font-black text-[#D4AF37] uppercase tracking-[0.2em]">webcraft-Ai</span>
-          </div>
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex desktop-nav items-center gap-10">
+        <nav className="hidden lg:flex items-center gap-12">
           {navLinks.map((link) => (
-            <Link 
-              key={link.path} 
+            <Link
+              key={link.path}
               href={link.path}
-              className={`text-[15px] font-bold transition-all relative py-1 ${pathname === link.path ? 'text-white' : 'text-[#6E6E73] hover:text-white'}`}
+              className={`text-sm font-bold tracking-widest uppercase transition-all relative py-1 ${
+                pathname === link.path ? "text-white" : "text-[#A1A1A6] hover:text-white"
+              }`}
             >
               {link.name}
               {pathname === link.path && (
-                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-[#D4AF37] rounded-full shadow-[0_0_10px_#D4AF37]"></span>
+                <span className="absolute -bottom-2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_8px_white]"></span>
               )}
             </Link>
           ))}
-          
+
           <div className="relative group/dropdown py-1">
-            <span className={`text-[15px] font-bold cursor-pointer transition-all flex items-center gap-1.5 ${pathname.startsWith('/generate') ? 'text-white' : 'text-[#6E6E73] group-hover/dropdown:text-white'}`}>
-              AI Features
-              <svg className="w-3.5 h-3.5 transition-transform group-hover/dropdown:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+            <span
+              className={`text-sm font-bold tracking-widest uppercase cursor-pointer transition-all flex items-center gap-2 ${
+                pathname.startsWith("/generate") ? "text-white" : "text-[#A1A1A6] group-hover/dropdown:text-white"
+              }`}
+            >
+              Tools
+              <svg
+                className="w-3 h-3 transition-transform group-hover/dropdown:rotate-180"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={3}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
             </span>
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[240px] bg-[#121218]/95 backdrop-blur-3xl border border-white/10 rounded-2xl p-2 opacity-0 invisible translate-y-2 group-hover/dropdown:opacity-100 group-hover/dropdown:visible group-hover/dropdown:translate-y-0 transition-all duration-300 shadow-2xl">
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[280px] glass bg-[#020202]/95 border border-white/10 rounded-3xl p-3 opacity-0 invisible translate-y-4 group-hover/dropdown:opacity-100 group-hover/dropdown:visible group-hover/dropdown:translate-y-0 transition-all duration-500 shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
               {aiFeatures.map((item) => (
-                <button 
-                  key={item.path} 
+                <button
+                  key={item.path}
                   onClick={() => {
-                    if (!user) setIsAuthOpen(true);
-                    else window.location.href = item.path;
+                    if (status !== "authenticated") {
+                      setAuthOpen(true);
+                    } else {
+                      router.push(item.path);
+                    }
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 text-[#A1A1A6] hover:text-white hover:bg-white/5 rounded-xl transition-all font-bold text-sm text-left"
+                  className="w-full flex items-center justify-between px-5 py-4 text-[#8E8E93] hover:text-white hover:bg-white/5 rounded-2xl transition-all font-bold text-sm text-left group/item"
                 >
-                  <span className="text-lg">{item.icon}</span>
-                  {item.name}
+                  <div className="flex items-center gap-4">
+                    <span className="text-xl filter group-hover/item:drop-shadow-[0_0_8px_white]">
+                      {item.icon}
+                    </span>
+                    {item.name}
+                  </div>
+                  <ArrowRightIcon className="w-4 h-4 opacity-0 group-hover/item:opacity-100 translate-x-[-10px] group-hover/item:translate-x-0 transition-all" />
                 </button>
               ))}
             </div>
@@ -83,110 +129,154 @@ const Navbar = () => {
         </nav>
 
         {/* Right Section */}
-        <div className="flex items-center gap-3 md:gap-5">
+        <div className="flex items-center gap-1 sm:gap-6">
           {user ? (
-            <>
-              <div className="hidden sm:flex flex-col items-end mr-1">
-                <span className="text-[10px] font-black text-[#D4AF37] tracking-[0.1em] uppercase">Credits</span>
-                <span className="text-sm font-bold text-white tracking-wide">✨ {user.credits + user.dailyFreeCredits}</span>
-              </div>
-              <div className="relative group/user z-[1001]">
-                <button className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2.5 rounded-xl transition-all hover:bg-white/10 hover:border-white/20">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#F5D97A] flex items-center justify-center text-[10px] text-black font-black uppercase">
-                    {user.name.charAt(0)}
-                  </div>
-                  <span className="text-sm font-bold text-white hidden md:inline truncate max-w-[100px]">{user.name}</span>
-                  <svg className="w-3 h-3 text-[#6E6E73] transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
-                </button>
-                <div className="absolute top-full right-0 mt-2 w-52 bg-[#121218]/95 backdrop-blur-3xl border border-white/10 rounded-2xl p-2 opacity-0 invisible translate-y-2 group-hover/user:opacity-100 group-hover/user:visible group-hover/user:translate-y-0 transition-all duration-300 shadow-2xl">
-                  <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-[#A1A1A6] hover:text-white hover:bg-white/5 rounded-xl font-bold text-[13px]">📊 Dashboard</Link>
-                  <Link href="/history" className="flex items-center gap-3 px-4 py-3 text-[#A1A1A6] hover:text-white hover:bg-white/5 rounded-xl font-bold text-[13px]">🕒 History</Link>
-                  <div className="h-px bg-white/5 my-1 mx-2"></div>
-                  <button onClick={logout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-400/10 rounded-xl font-bold text-[13px] text-left">🚪 Log out</button>
+            <div className="flex items-center gap-2 sm:gap-6">
+               <div className="hidden sm:flex flex-col items-end">
+                <span className="text-[10px] font-bold text-white tracking-widest text-glow">
+                  {user.credits + (user.dailyFreeCredits || 0)} CREDITS
+                </span>
+                <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden mt-1 mt-1 border border-white/5">
+                  <div
+                    className="h-full bg-gradient-to-r from-white to-[#3B82F6] shadow-[0_0_5px_white]"
+                    style={{ width: `${Math.min(100, (((user.credits + (user.dailyFreeCredits || 0))) / 100) * 100)}%` }}
+                  ></div>
                 </div>
               </div>
-            </>
+
+              <div className="relative group/user">
+                 <button className="flex items-center gap-1 sm:gap-3 glass-card bg-white/5 border border-white/10 px-1.5 py-1 sm:px-4 sm:py-2 hover:bg-white/10 transition-all">
+                  <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-white to-[#3B82F6] flex items-center justify-center text-[8px] sm:text-[11px] text-black font-black uppercase shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+                    {user.name?.charAt(0) || user.email?.charAt(0) || "U"}
+                  </div>
+                  <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                <div className="absolute top-full right-0 mt-4 w-56 glass bg-[#020202]/95 border border-white/10 rounded-3xl p-3 opacity-0 invisible translate-y-4 group-hover/user:opacity-100 group-hover/user:visible group-hover/user:translate-y-0 transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
+                  <Link href="/dashboard" className="flex items-center gap-4 px-5 py-3.5 text-[#A1A1A6] hover:text-white hover:bg-white/5 rounded-2xl font-bold text-sm tracking-wide transition-all">📊 DASHBOARD</Link>
+                  <Link href="/history" className="flex items-center gap-4 px-5 py-3.5 text-[#A1A1A6] hover:text-white hover:bg-white/5 rounded-2xl font-bold text-sm tracking-wide transition-all">🕒 HISTORY</Link>
+                  <div className="h-px bg-white/5 my-2 mx-3"></div>
+                  <button onClick={logout} className="flex items-center gap-4 w-full px-5 py-3.5 text-red-400 hover:bg-red-400/10 rounded-2xl font-bold text-sm tracking-wide text-left transition-all">🚪 LOG OUT</button>
+                </div>
+              </div>
+            </div>
           ) : (
-            <>
-              <button onClick={() => setIsAuthOpen(true)} className="hidden sm:block text-[#A1A1A6] hover:text-white font-bold text-sm transition-all px-2">Log in</button>
-              <button 
-                onClick={() => setIsAuthOpen(true)} 
-                className="bg-[#D4AF37] text-black px-5 py-2.5 rounded-xl font-black text-sm shadow-[0_0_25px_rgba(212,175,55,0.4)] hover:shadow-[0_0_40px_rgba(245,217,122,0.6)] active:scale-95 transition-all"
+             <div className="flex items-center gap-2 sm:gap-4">
+               <button 
+                onClick={() => setAuthOpen(true)} 
+                className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-black px-4 sm:px-8 py-2 sm:py-3.5 rounded-xl bg-white border-2 border-white shadow-[0_0_30px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-all ring-4 ring-white/30"
               >
-                Sign up
+                Log In
               </button>
-            </>
+               <button
+                onClick={() => setAuthOpen(true)}
+                className="bg-white text-black px-4 py-2 sm:px-8 sm:py-3.5 font-black text-[10px] sm:text-xs uppercase tracking-[0.2em] shadow-[0_0_40px_rgba(255,255,255,0.5)] hover:shadow-[0_0_60px_rgba(255,255,255,0.7)] active:scale-95 transition-all flex items-center gap-1 sm:gap-2 rounded-xl border-2 border-white"
+              >
+                Sign Up
+              </button>
+            </div>
           )}
 
-          {/* Hamburger Menu - Improved Style */}
-          <button 
+          {/* Hamburger Menu */}
+          <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="mobile-toggle w-11 h-11 flex flex-col items-center justify-center gap-1.5 bg-white/5 border border-white/10 rounded-xl z-[1001]"
+            className="lg:hidden w-12 h-12 flex flex-col items-center justify-center gap-1.5 glass bg-white/5 rounded-2xl z-[1001] border border-white/10"
           >
-            <span className={`h-0.5 bg-white rounded-full transition-all duration-300 ${isMobileMenuOpen ? 'w-6 rotate-45 translate-y-2' : 'w-6'}`}></span>
-            <span className={`h-0.5 bg-white rounded-full transition-all duration-300 ${isMobileMenuOpen ? 'w-0 opacity-0' : 'w-4'}`}></span>
-            <span className={`h-0.5 bg-white rounded-full transition-all duration-300 ${isMobileMenuOpen ? 'w-6 -rotate-45 -translate-y-2' : 'w-6'}`}></span>
+            <span
+              className={`h-0.5 bg-white rounded-full transition-all duration-300 ${
+                isMobileMenuOpen ? "w-6 rotate-45 translate-y-2" : "w-6"
+              }`}
+            ></span>
+            <span
+              className={`h-0.5 bg-white rounded-full transition-all duration-300 ${
+                isMobileMenuOpen ? "w-0 opacity-0" : "w-4"
+              }`}
+            ></span>
+            <span
+              className={`h-0.5 bg-white rounded-full transition-all duration-300 ${
+                isMobileMenuOpen ? "w-6 -rotate-45 -translate-y-2" : "w-6"
+              }`}
+            ></span>
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
-      <div className={`mobile-toggle fixed inset-0 bg-[#0A0A0B] z-[999] transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="absolute inset-x-0 top-0 h-[300px] bg-gradient-to-b from-[#D4AF37]/10 to-transparent pointer-events-none"></div>
-        <div className="flex flex-col h-full pt-28 px-6 pb-12 overflow-y-auto w-full">
-          <nav className="flex flex-col gap-9">
-            <div className="flex flex-col gap-3">
-              <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em] mb-2 px-1">Navigation</span>
-              <div className="flex flex-col gap-2">
-                {[...navLinks, { name: 'Dashboard', path: '/dashboard' }].map((link) => (
-                  <Link 
+      {/* Mobile Menu */}
+       <div
+        className={`lg:hidden fixed inset-0 bg-[#020202]/98 backdrop-blur-3xl z-[999] transition-all duration-700 cubic-bezier(0.19, 1, 0.22, 1) ${
+          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="fixed inset-0 grid-overlay opacity-30"></div>
+        <div className="flex flex-col h-full pt-32 px-10 pb-16 overflow-y-auto w-full relative z-10">
+            <nav className="flex flex-col gap-10">
+              <div className="flex flex-col gap-4">
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em] mb-4">NAVIGATION</span>
+                {[...navLinks, { name: "Dashboard", path: "/dashboard" }].map((link) => (
+                  <Link
                     key={link.path}
                     href={link.path}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center justify-between p-5 rounded-2xl font-black text-lg transition-all border ${pathname === link.path ? 'bg-[#D4AF37]/10 border-[#D4AF37]/30 text-white shadow-[0_0_30px_rgba(212,175,55,0.1)]' : 'bg-white/[0.03] border-white/5 text-[#6E6E73]'}`}
+                    className={`text-4xl font-black uppercase tracking-tighter transition-all ${
+                      pathname === link.path ? "text-white" : "text-[#8E8E93] hover:text-white"
+                    }`}
                   >
                     {link.name}
-                    {pathname === link.path && <div className="w-2 h-2 rounded-full bg-[#D4AF37] shadow-[0_0_10px_#D4AF37]"></div>}
                   </Link>
                 ))}
               </div>
-            </div>
 
-            <div className="flex flex-col gap-3">
-              <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em] mb-2 px-1">AI Features</span>
-              <div className="grid grid-cols-1 gap-2">
-                {aiFeatures.map((item) => (
-                  <button 
-                    key={item.path}
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      if (!user) setIsAuthOpen(true);
-                      else window.location.href = item.path;
-                    }}
-                    className="flex items-center gap-4 p-5 bg-white/[0.03] border border-white/5 rounded-2xl text-[#A1A1A6] hover:text-white transition-all font-bold text-base text-left"
-                  >
-                    <span className="text-2xl">{item.icon}</span>
-                    {item.name}
-                  </button>
-                ))}
+               <div className="flex flex-col gap-4 mt-8">
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em] mb-4">AI ECOSYSTEM</span>
+                <div className="grid grid-cols-1 gap-4">
+                  {aiFeatures.map((item) => (
+                    <button
+                      key={item.path}
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        if (status !== "authenticated") {
+                          setAuthOpen(true);
+                        } else {
+                          window.location.href = item.path;
+                        }
+                      }}
+                      className="flex items-center gap-6 p-6 glass bg-white/[0.02] border border-white/5 rounded-[32px] text-[#8E8E93] hover:text-white transition-all text-left group"
+                    >
+                      <span className="text-3xl group-hover:scale-110 transition-transform">
+                        {item.icon}
+                      </span>
+                      <span className="text-xl font-black uppercase tracking-tight">{item.name}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {user && (
-              <button 
-                onClick={() => { logout(); setIsMobileMenuOpen(false); }}
-                className="mt-6 flex items-center justify-center gap-3 p-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 font-bold text-lg active:scale-95 transition-all"
-              >
-                Log out
-              </button>
-            )}
-          </nav>
+              {user && (
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="mt-12 py-6 px-10 rounded-[32px] glass bg-red-500/5 border border-red-500/20 text-red-500 font-black uppercase tracking-widest text-lg hover:bg-red-500/10 transition-all text-center"
+                >
+                  Log out
+                </button>
+              )}
+           </nav>
         </div>
       </div>
 
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+      <AuthModal 
+        isOpen={isAuthOpen} 
+        onClose={() => setAuthOpen(false)} 
+      />
     </header>
   );
 };
+
+const ArrowRightIcon = ({ className }: { className?: string }) => (
+  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className}>
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+  </svg>
+);
 
 export default Navbar;

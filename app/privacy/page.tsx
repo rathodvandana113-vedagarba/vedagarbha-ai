@@ -11,15 +11,15 @@ export default function PrivacyPage() {
       
       {/* Background Glow */}
       <div className="fixed inset-0 overflow-hidden -z-10 bg-[#0A0A0B]">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#D4AF37]/5 blur-[120px] rounded-full"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#D4AF37]/5 blur-[120px] rounded-full"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#3B82F6]/5 blur-[120px] rounded-full"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-white/5 blur-[120px] rounded-full"></div>
       </div>
 
       <main className="max-w-4xl mx-auto px-6 pt-32 pb-24 relative z-10">
         <div className="flex flex-col gap-6 mb-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 w-max">
-            <Shield size={14} className="text-[#D4AF37]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]">Legal & Compliance</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 w-max">
+            <Shield size={14} className="text-white" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#A1A1A6]">Legal & Compliance</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-br from-white via-white to-white/40 bg-clip-text text-transparent">
             Privacy Policy
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
         <div className="space-y-12 text-[#A1A1A6] leading-relaxed animate-in fade-in slide-in-from-bottom-12 duration-1000 fill-mode-both">
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <Info size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">1. Introduction</h2>
@@ -42,7 +42,7 @@ export default function PrivacyPage() {
 
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <Eye size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">2. Information We Collect</h2>
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
                   "Payment details (via Razorpay)"
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 p-4 bg-white/[0.02] border border-white/5 rounded-xl text-sm font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/40"></div>
                     {item}
                   </li>
                 ))}
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
 
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <Smartphone size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">3. How We Use Information</h2>
@@ -89,7 +89,7 @@ export default function PrivacyPage() {
 
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <FileText size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">4. AI Generated Content</h2>
@@ -99,22 +99,22 @@ export default function PrivacyPage() {
 
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <UserCheck size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">5. Third Party Services</h2>
              </div>
              <p>We integrate with trusted third-party services to provide our platform:</p>
              <ul className="mt-4 space-y-2">
-                <li className="flex items-center gap-2"><span className="text-[#D4AF37] font-bold px-2 py-0.5 bg-[#D4AF37]/10 rounded text-xs select-none">PAYMENT</span> Razorpay for secure transactions</li>
-                <li className="flex items-center gap-2"><span className="text-white/60 font-bold px-2 py-0.5 bg-white/10 rounded text-xs select-none">INFRA</span> Advanced cloud hosting providers</li>
-                <li className="flex items-center gap-2"><span className="text-white/60 font-bold px-2 py-0.5 bg-white/10 rounded text-xs select-none">METRICS</span> Internal & external analytics tools</li>
+                <li className="flex items-center gap-2"><span className="text-white filter drop-shadow-[0_0_5px_rgba(255,255,255,0.2)] font-bold px-2 py-0.5 bg-white/10 rounded text-xs select-none uppercase tracking-tighter">PAYMENT</span> Razorpay for secure transactions</li>
+                <li className="flex items-center gap-2"><span className="text-white/60 font-bold px-2 py-0.5 bg-white/10 rounded text-xs select-none uppercase tracking-tighter">INFRA</span> Advanced cloud hosting providers</li>
+                <li className="flex items-center gap-2"><span className="text-white/60 font-bold px-2 py-0.5 bg-white/10 rounded text-xs select-none uppercase tracking-tighter">METRICS</span> Internal & external analytics tools</li>
              </ul>
           </section>
 
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <Lock size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">6. Data Security</h2>
@@ -141,11 +141,11 @@ export default function PrivacyPage() {
             </section>
           </div>
 
-          <div className="p-8 rounded-2xl bg-gradient-to-br from-[#121218] to-[#0A0A0B] border border-[#D4AF37]/20 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/5 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+          <div className="p-8 rounded-2xl bg-gradient-to-br from-[#121218] to-[#0A0A0B] border border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#3B82F6]/5 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
             <h2 className="text-2xl font-bold text-white mb-4">Need Help?</h2>
             <p className="text-sm mb-6 max-w-md">If you have any questions about this Privacy Policy or how we handle your data, please reach out to our legal team.</p>
-            <a href="mailto:privacy@vedagarbha.ai" className="inline-flex items-center gap-3 px-6 py-3 bg-[#D4AF37] text-[#0A0A0B] font-bold rounded-xl transition-transform hover:scale-105">
+            <a href="mailto:privacy@vedagarbha.ai" className="inline-flex items-center gap-3 px-6 py-3 bg-white text-black font-bold rounded-xl transition-transform hover:scale-105">
                Contact Support
             </a>
           </div>

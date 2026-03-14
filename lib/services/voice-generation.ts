@@ -10,16 +10,18 @@
  */
 
 export async function generateVoice(text: string, voiceId?: string) {
-  const apiKey = process.env.VOICE_API_KEY;
+  const apiKey = process.env.ELEVENLABS_API_KEY;
 
   if (!apiKey) {
-    console.warn("VOICE_API_KEY is missing. Returning a mock success response.");
+    console.warn("[ELEVENLABS_API_KEY] NOT FOUND - FALLBACK TO MOCK");
     // Simulate API delay
     await new Promise(r => setTimeout(r, 1500));
+    const resultUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
     return {
       success: true,
       data: {
-        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", // Mock audio - full sample track
+        audioUrl: resultUrl, // Keep for backward compat
+        resultUrl,
         text,
         voiceId: voiceId || "rachel",
         duration: Math.ceil(text.length / 15),
@@ -58,7 +60,8 @@ export async function generateVoice(text: string, voiceId?: string) {
   return {
     success: true,
     data: {
-      audioUrl: audioDataUrl,
+      audioUrl: audioDataUrl, // Keep for backward compat
+      resultUrl: audioDataUrl,
       text
     }
   };

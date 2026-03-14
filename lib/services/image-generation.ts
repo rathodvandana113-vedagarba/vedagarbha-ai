@@ -10,10 +10,10 @@
  */
 
 export async function generateImage(prompt: string, aspectRatio: string) {
-  const apiKey = process.env.IMAGE_API_KEY;
+  const apiKey = process.env.REPLICATE_API_TOKEN;
 
   if (!apiKey) {
-    console.warn("IMAGE_API_KEY is missing. Returning a mock success response.");
+    console.warn("[REPLICATE_API_TOKEN] NOT FOUND - FALLBACK TO MOCK");
     // Simulate API delay
     await new Promise(r => setTimeout(r, 2000));
     const mockImages = [
@@ -34,39 +34,56 @@ export async function generateImage(prompt: string, aspectRatio: string) {
     };
   }
 
-  // ==== REAL INTEGRATION START ====
-  const sizeMapping: Record<string, string> = {
-    "1:1": "1024x1024",
-    "16:9": "1792x1024",
-    "9:16": "1024x1792",
-  };
-  const size = sizeMapping[aspectRatio] || "1024x1024";
-
-  const response = await fetch('https://api.openai.com/v1/images/generations', {
+  // ==== REAL REPLICATE INTEGRATION ====
+  // Using FLUX.1 [schnell] for fast, high-quality images
+  const response = await fetch('https://api.replicate.com/v1/predictions', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
+      'Authorization': `Token ${apiKey}`,
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: prompt,
-      n: 1,
-      size: size
+      version: "31191060936e3ed983577322fb7d425b741088496464f69903b4cf713ece556e", // flux-schnell
+      input: {
+        prompt: prompt,
+        aspect_ratio: aspectRatio.replace(':', '/'),
+        output_format: "webp",
+        output_quality: 90
+      }
     })
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("OpenAI Image API Error:", errorText);
+    console.error("Replicate Image API Error:", errorText);
     throw new Error(`Image generation failed: ${response.statusText}`);
   }
 
-  const result = await response.json();
+  const prediction = await response.json();
+  
+  // Replicate predictions are async. We'll poll for a simple demo context, 
+  // or return the first output if available (some models return immediately)
+  let result = prediction;
+  let attempts = 0;
+  while ((result.status !== 'succeeded' && result.status !== 'failed') && attempts < 30) {
+    await new Promise(r => setTimeout(r, 1000));
+    const pollRes = await fetch(result.urls.get, {
+      headers: { 'Authorization': `Token ${apiKey}` }
+    });
+    result = await pollRes.json();
+    attempts++;
+  }
+
+  if (result.status === 'failed') {
+    throw new Error(`Replicate failed: ${result.error}`);
+  }
+
+  const resultUrl = result.output?.[0] || result.output;
   return {
     success: true,
     data: {
-      url: result.data[0].url,
+      url: resultUrl, // Keep for backward compat
+      resultUrl,
       prompt, 
       ratio: aspectRatio
     }

@@ -63,8 +63,8 @@ export default function StudentVerificationModal({ isOpen, onClose }: StudentVer
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="relative w-full max-w-md p-8 overflow-hidden bg-[#121218]/90 backdrop-blur-2xl border border-white/5 rounded-[24px] shadow-[0_24px_64px_rgba(0,0,0,0.8),0_0_40px_rgba(212,175,55,0.05)]">
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
+      <div className="relative w-full max-w-md p-8 overflow-hidden bg-[#121218]/90 backdrop-blur-2xl border border-white/5 rounded-[24px] shadow-[0_24px_64px_rgba(0,0,0,0.8),0_0_40px_rgba(59,130,246,0.05)]">
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#3B82F6]/30 to-transparent"></div>
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-gray-500 transition-colors hover:text-white rounded-full hover:bg-white/5"
@@ -74,14 +74,14 @@ export default function StudentVerificationModal({ isOpen, onClose }: StudentVer
 
         {success ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <CheckCircle2 size={64} className="text-[#D4AF37] mb-4 drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]" />
+            <CheckCircle2 size={64} className="text-[#3B82F6] mb-4 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
             <h2 className="text-2xl font-bold text-white mb-2">Verification Successful!</h2>
             <p className="text-gray-400">Your 25% student discount is now active.</p>
           </div>
         ) : (
           <>
             <div className="flex flex-col items-center mb-6 text-center">
-              <div className="w-12 h-12 mb-4 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#F5D97A] flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.4)]">
+              <div className="w-12 h-12 mb-4 rounded-xl bg-gradient-to-br from-white to-[#E2E2E2] flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 <span className="text-xl font-black text-[#0B0B0F]">🎓</span>
               </div>
               <h2 className="text-2xl font-bold text-white">Student Verification</h2>
@@ -115,7 +115,7 @@ export default function StudentVerificationModal({ isOpen, onClose }: StudentVer
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-[#0B0B0F] border border-white/5 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                    className="w-full bg-[#0B0B0F] border border-white/5 rounded-xl py-3 pl-10 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-[#3B82F6] transition-colors"
                   />
                 </div>
               ) : (
@@ -130,15 +130,15 @@ export default function StudentVerificationModal({ isOpen, onClose }: StudentVer
                   />
                   <label 
                     htmlFor="id-upload"
-                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-xl bg-[#0B0B0F] hover:bg-white/5 hover:border-[#D4AF37]/50 transition-colors cursor-pointer group"
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-xl bg-[#0B0B0F] hover:bg-white/5 hover:border-[#3B82F6]/50 transition-colors cursor-pointer group"
                   >
                     {file ? (
-                      <div className="flex flex-col items-center text-[#D4AF37]">
+                      <div className="flex flex-col items-center text-[#3B82F6]">
                         <ImageIcon size={24} className="mb-2" />
                         <span className="text-sm font-medium text-center truncate max-w-[200px]">{file.name}</span>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center text-gray-500 group-hover:text-[#D4AF37] transition-colors">
+                      <div className="flex flex-col items-center text-gray-500 group-hover:text-white transition-colors">
                         <Upload size={24} className="mb-2" />
                         <span className="text-sm font-medium">Click to upload Student ID</span>
                         <span className="text-xs mt-1 opacity-70">JPG, PNG, WEBP (Max 5MB)</span>
@@ -151,7 +151,7 @@ export default function StudentVerificationModal({ isOpen, onClose }: StudentVer
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 mt-4 font-semibold text-white transition-all bg-[#0B0B0F] border border-[#D4AF37] rounded-xl hover:-translate-y-0.5 shadow-[0_0_15px_rgba(212,175,55,0.2)] hover:shadow-[0_0_25px_rgba(245,217,122,0.4)] hover:border-[#F5D97A] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 mt-4 font-black uppercase tracking-widest text-[#0B0B0F] transition-all bg-white rounded-xl hover:-translate-y-0.5 shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:shadow-[0_0_25px_rgba(59,130,246,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Verifying..." : "Verify Status"}
               </button>

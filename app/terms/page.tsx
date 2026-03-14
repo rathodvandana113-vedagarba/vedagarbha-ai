@@ -11,14 +11,14 @@ export default function TermsPage() {
       
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden -z-10 bg-[#0A0A0B]">
-        <div className="absolute top-[20%] right-[-10%] w-[50%] h-[50%] bg-[#D4AF37]/5 blur-[150px] rounded-full"></div>
+        <div className="absolute top-[20%] right-[-10%] w-[50%] h-[50%] bg-[#3B82F6]/5 blur-[150px] rounded-full"></div>
       </div>
 
       <main className="max-w-4xl mx-auto px-6 pt-32 pb-24 relative z-10">
         <div className="flex flex-col gap-6 mb-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 w-max">
-            <Gavel size={14} className="text-[#D4AF37]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]">Legal Framework</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 w-max">
+            <Gavel size={14} className="text-white" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#A1A1A6]">Legal Framework</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
             Terms of Service
@@ -32,7 +32,7 @@ export default function TermsPage() {
           
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <Handshake size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">1. Acceptance of Terms</h2>
@@ -42,7 +42,7 @@ export default function TermsPage() {
 
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <Info size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">2. User Accounts</h2>
@@ -52,7 +52,7 @@ export default function TermsPage() {
 
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <CreditCard size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">3. Credit System</h2>
@@ -64,8 +64,8 @@ export default function TermsPage() {
                     <div className="text-white font-bold text-sm mb-1 uppercase tracking-wider">Purchase</div>
                     <p className="text-xs">Credits can be purchased securely using Razorpay integration.</p>
                   </div>
-                  <div className="p-4 bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-xl">
-                    <div className="text-[#D4AF37] font-bold text-sm mb-1 uppercase tracking-wider">Refunds</div>
+                  <div className="p-4 bg-white/5 border border-white/10 rounded-xl">
+                    <div className="text-white font-bold text-sm mb-1 uppercase tracking-wider">Refunds</div>
                     <p className="text-xs">Credits are strictly non-refundable once they have been used to generate content.</p>
                   </div>
                 </div>
@@ -74,7 +74,7 @@ export default function TermsPage() {
 
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <Ban size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">4. Acceptable Use Policy</h2>
@@ -84,7 +84,7 @@ export default function TermsPage() {
 
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <ShieldCheck size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">5. AI Generated Content Disclaimer</h2>
@@ -94,7 +94,7 @@ export default function TermsPage() {
 
           <section className="group">
              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-[#D4AF37]/30 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:border-white/30 transition-colors">
                   <Handshake size={20} />
                 </div>
                 <h2 className="text-2xl font-bold text-white">6. Intellectual Property</h2>
@@ -128,11 +128,11 @@ export default function TermsPage() {
           </div>
 
           <div className="flex flex-col items-center text-center pt-8 border-t border-white/10">
-             <div className="w-12 h-12 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] mb-4">
+             <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white mb-4">
                 <Mail size={24} />
              </div>
              <h2 className="text-2xl font-bold text-white mb-2">Legal Contact</h2>
-             <p className="text-sm">For legal inquiries or support questions, please email <a href="mailto:support@vedagarbha.ai" className="text-[#D4AF37] underline">support@vedagarbha.ai</a></p>
+             <p className="text-sm">For legal inquiries or support questions, please email <a href="mailto:support@vedagarbha.ai" className="text-white underline font-bold transition-all hover:text-[#3B82F6]">support@vedagarbha.ai</a></p>
           </div>
         </div>
       </main>

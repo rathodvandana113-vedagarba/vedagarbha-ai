@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
 import StudentVerificationModal from '../../components/auth/StudentVerificationModal';
 import Script from 'next/script';
+import { Sparkles, Zap, Shield, Cpu, ArrowRight, Check, GraduationCap } from 'lucide-react';
 
 export default function PricingPage() {
   const { user, updateCredits, addHistoryItem } = useAuth();
@@ -15,22 +16,19 @@ export default function PricingPage() {
   const [credits, setCredits] = useState(100);
 
   const PRICING_MAP: Record<number, number> = {
+    25: 159,
+    50: 329,
     100: 699,
     200: 1299,
-    300: 2000,
-    500: 3299,
-    850: 6000,
-    1299: 6600,
+    300: 1899,
+    500: 2999,
+    800: 4499,
+    1300: 6499,
   };
 
   const calculatePrice = (amount: number, studentStatus: boolean) => {
     const basePrice = PRICING_MAP[amount] || amount * 10;
-
-    if (studentStatus) {
-      // 25% off
-      return Math.round(basePrice * 0.75);
-    }
-    
+    if (studentStatus) return Math.round(basePrice * 0.75);
     return basePrice;
   };
 
@@ -41,7 +39,6 @@ export default function PricingPage() {
     }
 
     try {
-      // 0. Mock Bypass if localhost
       if (window.location.hostname === 'localhost') {
         updateCredits(credits);
         addHistoryItem({
@@ -56,8 +53,6 @@ export default function PricingPage() {
       }
 
       const price = calculatePrice(credits, isStudent);
-      
-      // 1. Create Order on Backend
       const orderRes = await fetch('/api/payment/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,21 +60,23 @@ export default function PricingPage() {
       });
       
       const orderData = await orderRes.json();
-      
       if (!orderRes.ok || !orderData.order) {
-        throw new Error(orderData.error || "Failed to initialize payment");
+        const errorMsg = orderData.details || orderData.error || "Failed to initialize payment";
+        throw new Error(errorMsg);
       }
 
-      // 2. Setup Razorpay Options
+      if (!orderData.keyId && window.location.hostname !== 'localhost') {
+        throw new Error("Razorpay Configuration Error: Missing Gateway ID");
+      }
+
       const options = {
-        key: orderData.keyId || "rzp_test_YOUR_TEST_KEY", 
+        key: orderData.keyId, 
         amount: orderData.order.amount,
         currency: orderData.order.currency,
         name: "Vedagarbha AI",
         description: `${credits} Credits Pack`,
         order_id: orderData.order.id,
         handler: async function (response: any) {
-          // 3. Verify Payment
           try {
             const verifyRes = await fetch('/api/payment/verify', {
               method: 'POST',
@@ -91,12 +88,8 @@ export default function PricingPage() {
               })
             });
 
-            const verifyData = await verifyRes.json();
-
             if (verifyRes.ok) {
               updateCredits(credits);
-              
-              // Add to history
               addHistoryItem({
                 id: response.razorpay_payment_id,
                 type: 'credit_purchase',
@@ -104,9 +97,9 @@ export default function PricingPage() {
                 cost: 0, 
                 timestamp: new Date().toISOString()
               });
-              
               alert(`Payment Success:\nSuccessfully added ${credits} credits to your account!`);
             } else {
+              const verifyData = await verifyRes.json();
               alert("Payment Verification Failed: " + verifyData.error);
             }
           } catch (err) {
@@ -118,18 +111,12 @@ export default function PricingPage() {
           name: user.name || "User",
           email: user.email || "user@example.com",
         },
-        theme: {
-          color: "#D4AF37"
-        }
+        theme: { color: "#FFFFFF" }
       };
 
       const rzp = new (window as any).Razorpay(options);
-      rzp.on('payment.failed', function (response: any){
-        alert("Payment Failed: " + response.error.description);
-      });
+      rzp.on('payment.failed', (response: any) => alert("Payment Failed: " + response.error.description));
       rzp.open();
-      
-      
     } catch (err: any) {
       console.error(err);
       alert(err.message || "Network Error: Could not reach backend.");
@@ -149,101 +136,146 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0B0F] text-white font-sans">
+    <div className="min-h-screen text-white font-sans overflow-x-hidden selection:bg-white/30">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       <Navbar />
       
-      <main className="pt-[72px] pb-24">
-        <div className="max-w-[1000px] mx-auto px-8 pt-16 flex flex-col gap-12">
-          
-          <header className="text-center flex flex-col items-center gap-4">
-            <h1 className="text-5xl md:text-[56px] font-extrabold tracking-tight">Simple, Transparent Pricing</h1>
-            <p className="text-lg text-[#A1A1A6] max-w-[600px]">Pay only for what you generate. Buy credit packs that never expire.</p>
-            
-            <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] px-6 py-3 rounded-xl mt-6 text-sm md:text-base">
-              Students get 25% OFF on all AI credits. Verify your student status to unlock the discount.
+      <main className="pt-[160px] pb-32">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <header className="text-center mb-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div className="inline-flex items-center gap-3 glass bg-white/5 px-4 py-2 rounded-full border-glow mb-8">
+              <Shield size={16} className="text-[#3B82F6] animate-pulse" />
+              <span className="text-[10px] md:text-xs font-black tracking-[0.3em] text-[#E2E2E2] uppercase text-glow">Secure Credits & Packs</span>
             </div>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 gradient-text">SIMPLE & <span className="text-white">POWERFUL</span></h1>
+            <p className="text-xl text-[#A1A1A6] max-w-2xl mx-auto font-medium leading-relaxed mb-12">
+              Fuel your creativity with high-performance AI credits. Choose a pack that scales with your needs.
+            </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 bg-[#121218]/80 backdrop-blur-xl px-4 sm:px-6 py-4 sm:py-3 rounded-2xl sm:rounded-full border border-white/5 mt-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] w-full sm:w-auto">
-              <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
-                <span className={`text-[14px] sm:text-[15px] transition-colors duration-300 ${!isStudent ? 'text-white font-semibold' : 'text-[#6E6E73] font-medium'}`}>Regular User</span>
-                
-                <div 
-                  className={`w-14 h-8 bg-[#1C1C1F] rounded-full border border-white/10 relative cursor-pointer transition-all duration-300 ${(!user || user.studentStatus !== 'verified') ? 'opacity-50' : ''}`}
-                  onClick={handleStudentToggle}
-                >
-                  <div className={`absolute top-[2px] left-[2px] w-[26px] h-[26px] rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.8)] transition-all duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] flex items-center justify-center ${isStudent ? 'translate-x-6 bg-[#D4AF37]' : 'bg-[#A1A1A6]'}`}></div>
-                </div>
-              </div>
-              
-              <span className={`text-[14px] sm:text-[15px] transition-colors duration-300 flex items-center gap-2 ${isStudent ? 'text-white font-semibold' : 'text-[#6E6E73] font-medium'}`}>
-                Verified Student 
-                <span className="bg-[#D4AF37]/15 text-[#D4AF37] px-2 py-1 rounded-[4px] text-[10px] sm:text-[11px] font-bold uppercase tracking-wider border border-[#D4AF37]/20 whitespace-nowrap">Save 25%</span>
-              </span>
+            {/* Student Discount Toggle Box */}
+            <div className="mx-auto w-full max-w-[600px] glass p-8 rounded-[40px] border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.5)] animate-float">
+               <div className="flex flex-col md:flex-row items-center gap-8 justify-between">
+                  <div className="flex items-center gap-5 text-left">
+                     <div className="w-16 h-16 glass-card bg-white/5 flex items-center justify-center rounded-3xl animate-pulse">
+                        <GraduationCap className="text-[#3B82F6]" size={36}/>
+                     </div>
+                     <div>
+                        <h4 className="text-xl font-black tracking-tight text-white leading-none mb-2">STUDENT DISCOUNT</h4>
+                        <p className="text-sm font-bold text-[#8E8E93] uppercase tracking-widest">Verify & Save 25% Instant</p>
+                     </div>
+                  </div>
+                  <div 
+                    onClick={handleStudentToggle}
+                    className="cursor-pointer group relative flex flex-col items-center gap-3"
+                  >
+                     <div className={`w-20 h-10 rounded-full border-2 transition-all duration-500 relative ${isStudent ? 'bg-white border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' : 'bg-white/5 border-white/10'}`}>
+                        <div className={`absolute top-1 w-7 h-7 rounded-full bg-white shadow-xl transition-all duration-500 ease-out ${isStudent ? 'left-11' : 'left-1'}`}></div>
+                     </div>
+                     <span className={`text-[10px] font-black uppercase tracking-widest ${isStudent ? 'text-white text-glow' : 'text-[#6E6E73]'}`}>
+                        {user?.studentStatus === 'verified' ? (isStudent ? 'DISCOUNT ACTIVE' : 'UNLOCKED') : 'VERIFY NOW'}
+                     </span>
+                  </div>
+               </div>
             </div>
           </header>
 
-          <div className="bg-[#121218]/60 backdrop-blur-2xl border border-white/5 rounded-[24px] overflow-hidden shadow-[0_24px_64px_rgba(0,0,0,0.8)] relative">
-            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
-            <div className="p-8 md:p-12 flex flex-col gap-8">
-              <h2 className="text-2xl font-semibold text-center">Select Credit Pack</h2>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {[100, 200, 300, 500, 850, 1299].map(amount => (
-                  <button 
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start relative z-10 perspective-1000">
+             {/* Main Select Area */}
+              <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 animate-in fade-in slide-in-from-left-8 duration-700">
+                {[25, 50, 100, 200, 300, 500, 800, 1300].map((amount, i) => (
+                   <div 
                     key={amount}
-                    className={`bg-[#0B0B0F]/50 backdrop-blur-md rounded-2xl p-6 flex flex-col items-center gap-2 transition-all duration-300 hover:-translate-y-1 relative border ${credits === amount ? 'border-[#D4AF37] bg-[#D4AF37]/5 shadow-[0_0_20px_rgba(212,175,55,0.15)] glow-active' : 'border-white/5 hover:border-[#D4AF37]/40 hover:bg-white/[0.02]'}`}
                     onClick={() => setCredits(amount)}
-                  >
-                    {amount === 850 && (
-                      <span className="absolute -top-3 bg-gradient-to-r from-[#D4AF37] to-[#F5D97A] text-black text-[10px] font-bold px-3 py-1 rounded-full shadow-lg border border-[#F5D97A]/50">MOST POPULAR</span>
-                    )}
-                    {amount === 1299 && (
-                      <span className="absolute -top-3 bg-white text-black text-[10px] font-bold px-3 py-1 rounded-full shadow-lg border border-white/50 animate-pulse">ULTRA PACK</span>
-                    )}
-                    {isStudent && (
-                      <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur text-[#D4AF37] text-[9px] font-bold px-2 py-1 rounded-full border border-[#D4AF37]/20 whitespace-nowrap">🎓 STUDENT: 25% OFF</span>
-                    )}
-                    <span className="text-xl font-semibold text-white">{amount} Credits</span>
-                    <div className="flex flex-col items-center">
-                      <span className="text-lg text-white font-bold">₹{calculatePrice(amount, isStudent)}</span>
-                      {isStudent && (
-                        <span className="text-xs text-[#A1A1A6] line-through">₹{PRICING_MAP[amount]}</span>
-                      )}
-                    </div>
-                    <span className="text-xs text-[#A1A1A6]/60 mt-1">(₹{(calculatePrice(amount, isStudent) / amount).toFixed(2)} per credit)</span>
-                  </button>
-                ))}
-              </div>
+                    className={`glass-card cursor-pointer group p-8 flex flex-col items-start gap-4 transition-all duration-500 hover:scale-[1.03] active:scale-95 border border-white/5 ${credits === amount ? 'bg-white/5 border-white shadow-[0_0_50px_rgba(255,255,255,0.05)]' : 'hover:bg-white/5 hover:border-white/20'}`}
+                   >
+                     {amount === 800 && <div className="absolute top-0 right-0 bg-white text-black px-4 py-1.5 font-bold text-[10px] tracking-widest rounded-bl-2xl uppercase shadow-xl animate-pulse">BEST VALUE</div>}
+                     {amount === 1300 && <div className="absolute top-0 right-0 bg-white text-black px-4 py-1.5 font-bold text-[10px] tracking-widest rounded-bl-2xl uppercase shadow-xl">ULTRA LUXE</div>}
+                     
+                     <div className="flex items-center gap-4 w-full">
+                        <div className={`w-12 h-12 glass flex items-center justify-center rounded-2xl transition-all ${credits === amount ? 'bg-white text-black shadow-[0_0_20px_white]' : 'bg-white/5 text-[#8E8E93]'}`}>
+                           <Zap size={20} />
+                        </div>
+                        <div className="flex flex-col">
+                           <span className="text-2xl font-black tracking-tight text-white">{amount} CREDITS</span>
+                           <span className="text-[10px] font-black text-[#8E8E93] uppercase tracking-widest">Digital Tokens</span>
+                        </div>
+                     </div>
 
-              <div className="bg-[#0B0B0F] border border-white/5 rounded-2xl p-8 flex flex-col gap-4 mt-4 shadow-inner">
-                <div className="flex justify-between items-center text-base text-[#A1A1A6]">
-                  <span>Selected Pack</span>
-                  <span className="font-medium text-white">{credits} Credits</span>
-                </div>
-                <div className="flex justify-between items-center text-base text-[#A1A1A6]">
-                  <span>Base Price</span>
-                  <span className={isStudent ? "line-through opacity-50" : "font-medium text-white"}>₹{PRICING_MAP[credits]}</span>
-                </div>
-                <div className="border-t border-white/10 pt-4 mt-2 flex justify-between items-center text-xl font-semibold text-white">
-                  <span>Total Amount</span>
-                  <span className="bg-gradient-to-r from-[#D4AF37] to-[#F5D97A] text-transparent bg-clip-text text-2xl font-bold drop-shadow-[0_0_10px_rgba(245,217,122,0.4)]">
-                    ₹{calculatePrice(credits, isStudent)}
-                  </span>
-                </div>
+                     <div className="mt-4 flex flex-col">
+                        <div className="flex items-baseline gap-2">
+                           <span className="text-4xl font-black text-white">₹{calculatePrice(amount, isStudent)}</span>
+                           {isStudent && <span className="text-sm font-bold text-[#8E8E93] text-glow line-through">₹{PRICING_MAP[amount]}</span>}
+                        </div>
+                        <span className="text-xs font-bold text-[#8E8E93] tracking-wide mt-1">
+                           ₹{(calculatePrice(amount, isStudent) / amount).toFixed(2)} per credit
+                        </span>
+                     </div>
+
+                     <ul className="mt-6 flex flex-col gap-3 w-full">
+                        {["No Expiry", "4K Video Access", "HD Image Generation"].map(feature => (
+                           <li key={feature} className="flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-[#6E6E73] group-hover:text-white transition-colors">
+                              <Check size={14} className="text-[#3B82F6]" /> {feature}
+                           </li>
+                        ))}
+                     </ul>
+                   </div>
+                ))}
+             </div>
+
+             {/* Checkout Panel */}
+             <div className="lg:sticky lg:top-[120px] glass-card border-white/20 p-10 animate-in fade-in slide-in-from-right-8 duration-700 bg-[#020202]/60 depth-3">
+                <h3 className="text-3xl font-black tracking-tighter mb-8 gradient-text">ORDER SUMMARY</h3>
                 
-                <button 
-                  className="w-full mt-4 bg-[#0B0B0F] text-white border border-[#D4AF37] py-4 rounded-xl font-semibold text-lg transition-all shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_35px_rgba(245,217,122,0.4)] hover:border-[#F5D97A] hover:-translate-y-[1px]"
-                  onClick={handleCheckout}
-                >
-                  Pay with Razorpay
-                </button>
-                <p className="text-center text-[13px] text-[#6E6E73] mt-2">Secure payment processed by Razorpay. All prices inclusive of taxes.</p>
-              </div>
-            </div>
+                <div className="flex flex-col gap-8">
+                   <div className="flex justify-between items-center text-sm font-black tracking-[0.2em] uppercase opacity-60">
+                      <span>PACKAGE</span>
+                      <span>{credits} CREDITS</span>
+                   </div>
+                   
+                   <div className="space-y-4 py-8 border-y border-white/5">
+                      <div className="flex justify-between items-center text-sm">
+                         <span className="text-[#8E8E93] font-medium">Market Price</span>
+                         <span className="font-black">₹{PRICING_MAP[credits]}</span>
+                      </div>
+                      {isStudent && (
+                         <div className="flex justify-between items-center text-sm">
+                            <span className="text-[#3B82F6] font-medium">Student Discount</span>
+                            <span className="font-black text-[#3B82F6]">-₹{PRICING_MAP[credits] - calculatePrice(credits, isStudent)}</span>
+                         </div>
+                      )}
+                      <div className="flex justify-between items-center text-sm">
+                         <span className="text-[#8E8E93] font-medium">Processing Fee</span>
+                         <span className="font-black text-green-500 uppercase">FREE</span>
+                      </div>
+                   </div>
+
+                   <div className="flex justify-between items-center">
+                      <span className="text-xl font-black tracking-tighter uppercase">Total</span>
+                      <div className="flex flex-col items-end">
+                         <span className="text-4xl font-black bg-gradient-to-r from-white to-[#3B82F6] text-transparent bg-clip-text drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                            ₹{calculatePrice(credits, isStudent)}
+                         </span>
+                         <span className="text-[10px] font-bold text-[#6E6E73] tracking-widest mt-1">ALL TAXES INCLUDED</span>
+                      </div>
+                   </div>
+
+                   <button 
+                     onClick={handleCheckout}
+                     className="glass-card bg-white text-black px-8 py-5 rounded-[22px] font-black text-lg uppercase tracking-[0.2em] shadow-[0_20px_50px_rgba(255,255,255,0.1)] hover:shadow-[0_25px_60px_rgba(255,255,255,0.2)] hover:-translate-y-2 transition-all group flex items-center justify-center gap-3 mt-4"
+                   >
+                     Complete Order <ArrowRight className="group-hover:translate-x-2 transition-transform" />
+                   </button>
+                   
+                   <div className="flex flex-col items-center gap-4 mt-4 opacity-40">
+                      <div className="flex items-center gap-3">
+                         <Shield size={16} />
+                         <span className="text-[10px] font-black uppercase tracking-widest">Bank Grade Security</span>
+                      </div>
+                      <p className="text-[9px] text-center font-bold tracking-widest">POWERED BY RAZORPAY WORLDWIDE</p>
+                   </div>
+                </div>
+             </div>
           </div>
-          
-          
         </div>
       </main>
 
