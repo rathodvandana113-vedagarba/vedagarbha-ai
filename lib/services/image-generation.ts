@@ -10,7 +10,7 @@
  */
 
 export async function generateImage(prompt: string, aspectRatio: string) {
-  const apiKey = process.env.REPLICATE_API_TOKEN || process.env.IMAGE_API_KEY;
+  const apiKey = process.env.REPLICATE_API_TOKEN || process.env.IMAGE_API_KEY || "REMOVED_SECRET";
 
   if (!apiKey) {
     console.warn("[REPLICATE_API_TOKEN] NOT FOUND - FALLBACK TO MOCK");
