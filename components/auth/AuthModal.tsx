@@ -132,7 +132,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         <div className="flex mx-8 mb-6 bg-white/5 rounded-xl border border-white/10 p-1 gap-1">
           {(["login", "signup"] as const).map(t => (
             <button key={t} onClick={() => { setTab(t); setOtpSent(false); }}
-              className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${tab === t ? "bg-white text-black shadow-lg" : "text-gray-500 hover:text-white"}`}>
+              className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${tab === t ? "bg-white text-black shadow-lg" : "text-white/60 hover:text-white"}`}>
               {t === "login" ? "Log In" : "Sign Up"}
             </button>
           ))}
@@ -205,7 +205,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             )}
             
             <button type="submit" disabled={loading}
-              className="w-full py-4 mt-4 font-black text-black transition-all bg-white rounded-xl hover:bg-white/90 active:scale-95 disabled:opacity-50 tracking-[0.2em] uppercase text-[11px] shadow-[0_0_40px_rgba(255,255,255,0.3)]">
+              className="w-full py-4 mt-4 font-black text-black transition-all bg-white rounded-xl hover:bg-white/90 active:scale-95 disabled:opacity-50 tracking-[0.2em] uppercase text-[11px] shadow-[0_0_60px_rgba(255,255,255,0.5)]">
               {loading ? "AUTHENTICATING..." : tab === "phone" ? (otpSent ? "VERIFY OTP" : "SEND OTP") : (tab === "login" ? "LOG IN TO PLATFORM" : "INITIALIZE ACCOUNT")}
             </button>
           </form>
