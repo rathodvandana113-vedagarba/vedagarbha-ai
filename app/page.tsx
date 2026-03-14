@@ -41,12 +41,13 @@ export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Slower intervals for mobile performance
     const int = setInterval(() => {
       setDemoIdx((prev) => (prev + 1) % DEMOS.length);
-    }, 6000);
+    }, 10000); // 10s instead of 6s
     const showcaseInt = setInterval(() => {
       setShowcaseIdx((prev) => (prev + 1) % 6);
-    }, 4000);
+    }, 8000); // 8s instead of 4s
     return () => {
       clearInterval(int);
       clearInterval(showcaseInt);
@@ -63,7 +64,7 @@ export default function HomePage() {
       <Navbar />
       
       <main className="relative z-10">
-        <div className="absolute top-[10%] left-[20%] w-[800px] h-[800px] bg-[#3B82F6] rounded-full blur-[200px] opacity-[0.03] z-[-1] animate-float"></div>
+        <div className="absolute top-[10%] left-[20%] w-[300px] h-[300px] md:w-[800px] md:h-[800px] bg-[#3B82F6] rounded-full blur-[80px] md:blur-[200px] opacity-[0.03] z-[-1] animate-float"></div>
         
         <div className="max-w-[1440px] mx-auto px-6 md:px-12">
           {/* Hero Section */}
