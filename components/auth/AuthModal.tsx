@@ -135,10 +135,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </p>
         </div>
           
-          <p className="mt-4 text-[10px] text-center text-gray-600">
-            Your data is securely stored and your password is encrypted
-          </p>
-        </div>
+        <p className="mt-4 text-[10px] text-center text-gray-600">
+          Your data is securely stored and your password is encrypted
+        </p>
       </div>
     </div>
   );
