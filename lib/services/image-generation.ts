@@ -46,7 +46,7 @@ export async function generateImage(prompt: string, aspectRatio: string) {
       version: "31191060936e3ed983577322fb7d425b741088496464f69903b4cf713ece556e", // flux-schnell
       input: {
         prompt: prompt,
-        aspect_ratio: aspectRatio.replace(':', '/'),
+        aspect_ratio: aspectRatio,
         output_format: "webp",
         output_quality: 90
       }
