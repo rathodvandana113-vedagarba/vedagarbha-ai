@@ -155,16 +155,16 @@ const Navbar = () => {
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-1 sm:gap-4">
-                <button 
+            <div className="flex items-center gap-2 sm:gap-4">
+               <button 
                 onClick={() => setAuthOpen(true)} 
-                className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-white hover:text-[#3B82F6] transition-all px-2 sm:px-4 py-2 text-glow"
+                className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-white px-3 sm:px-6 py-2 sm:py-3 rounded-xl border border-white/40 bg-white/10 hover:bg-white hover:text-black transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] text-glow"
               >
                 Log In
               </button>
                <button
                 onClick={() => setAuthOpen(true)}
-                className="glass-card bg-white text-black px-1.5 py-1 sm:px-8 sm:py-3.5 font-black text-[7px] sm:text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center gap-1 sm:gap-2"
+                className="bg-white text-black px-3 py-2 sm:px-8 sm:py-3.5 font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-[0_0_50px_rgba(255,255,255,0.4)] hover:shadow-[0_0_70px_rgba(255,255,255,0.6)] active:scale-95 transition-all flex items-center gap-1 sm:gap-2 rounded-xl border-2 border-white"
               >
                 Sign Up
               </button>

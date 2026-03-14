@@ -164,7 +164,7 @@ export default function HomePage() {
                 </div>
                 <button 
                   onClick={() => setAuthOpen(true)}
-                  className="glass bg-white/5 px-6 py-3 md:px-8 md:py-4 rounded-full border border-white/10 text-glow font-black uppercase tracking-widest text-[10px] md:text-sm hover:bg-white hover:text-black hover:border-white transition-all whitespace-nowrap"
+                  className="bg-white text-black px-6 py-3 md:px-10 md:py-4 rounded-full shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)] font-black uppercase tracking-widest text-[10px] md:text-sm hover:-translate-y-1 transition-all whitespace-nowrap ring-4 ring-white/40"
                 >
                   Join the Beta ➔
                 </button>

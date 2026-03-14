@@ -139,22 +139,22 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </div>
 
         <div className="px-8 pb-8">
-          {/* Quick Auth Row - 3 Columns */}
-          <div className="grid grid-cols-3 gap-2 mb-8">
+          {/* Quick Auth Row - 3 Columns Inline */}
+          <div className="flex flex-row gap-2 mb-8">
             <button onClick={() => { setTab("phone"); setOtpSent(false); }} 
-              className={`flex flex-col items-center justify-center gap-2 py-3.5 rounded-xl border transition-all group ${tab === 'phone' ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}>
+              className={`flex-1 flex flex-col items-center justify-center gap-2 py-3 rounded-xl border transition-all group ${tab === 'phone' ? 'bg-white text-black border-white shadow-[0_0_30px_rgba(255,255,255,0.3)]' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}>
               <Phone size={14} className={tab === 'phone' ? 'text-black' : 'text-gray-400 group-hover:text-white'} />
               <span className="text-[9px] font-black uppercase tracking-widest">Mobile</span>
             </button>
             <button onClick={() => handleSocialLogin('google')} 
-              className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all group">
+              className="flex-1 flex flex-col items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all group">
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-3.5 h-3.5" alt="Google" />
               <span className="text-[9px] font-black uppercase tracking-widest">Google</span>
             </button>
             <button onClick={() => handleSocialLogin('apple')} 
-              className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all group">
-              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.062 13.917c.015 3.123 2.71 4.14 2.73 4.15-.022.072-.428 1.467-1.442 2.94-.877 1.272-1.788 2.54-3.208 2.566-1.396.026-1.847-.824-3.444-.824-1.6 0-2.098.803-3.418.853-1.373.05-2.404-1.37-3.287-2.642-1.808-2.61-3.19-7.37-1.32-10.612.928-1.61 2.585-2.616 4.385-2.642 1.373-.025 2.668.932 3.512.932.844 0 2.408-1.157 4.028-.992.678.028 2.583.272 3.805 2.062-.1-.06-.15.088-.15.424zM14.925 5.253c.71-.86 1.187-2.054 1.056-3.253-1.03.04-2.275.684-3.013 1.543-.66.758-1.238 1.968-1.082 3.142 1.15.088 2.328-.57 3.039-1.432z" />
+              className="flex-1 flex flex-col items-center justify-center gap-2 py-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all group">
+              <svg className="w-4 h-4 text-white group-hover:drop-shadow-[0_0_8px_white]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2.04-.156-3.935 1.09-4.909 1.09zM14.037 4.074c.834-1.026 1.4-2.454 1.246-3.87-1.221.052-2.701.819-3.584 1.844-.792.91-1.494 2.364-1.3 3.73 1.363.104 2.766-.715 3.638-1.704z" />
               </svg>
               <span className="text-[9px] font-black uppercase tracking-widest">Apple</span>
             </button>
