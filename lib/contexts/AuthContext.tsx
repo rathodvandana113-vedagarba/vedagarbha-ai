@@ -19,6 +19,7 @@ export type User = {
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
+  status: "loading" | "authenticated" | "unauthenticated";
   login: (email: string, pass: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   loginWithApple: () => Promise<void>;
@@ -199,7 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{
-      user, isLoading, login, loginWithGoogle, loginWithApple, loginWithPhone, signup, logout, applyForStudentAuth, adminApproveStudent, updateCredits, deductCredit, addHistoryItem
+      user, isLoading, status, login, loginWithGoogle, loginWithApple, loginWithPhone, signup, logout, applyForStudentAuth, adminApproveStudent, updateCredits, deductCredit, addHistoryItem
     }}>
       {children}
     </AuthContext.Provider>

@@ -38,13 +38,17 @@ export async function generateVoice(text: string, voiceId?: string) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("ElevenLabs API Error:", errorText);
+    console.error(`ElevenLabs API Error (Status ${response.status}):`, errorText);
     
     let errorMessage = "Voice generation failed.";
     try {
       const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson.detail?.message || errorMessage;
+      errorMessage = errorJson.detail?.message || errorJson.message || errorMessage;
     } catch (e) {}
+
+    if (response.status === 402) {
+      errorMessage = "Credits exceeded or Tier restricted. Please switch to a default voice or upgrade.";
+    }
 
     throw new Error(`${errorMessage} (Status: ${response.status})`);
   }

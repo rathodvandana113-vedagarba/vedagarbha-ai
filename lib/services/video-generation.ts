@@ -6,15 +6,7 @@ import crypto from 'crypto';
  * Using Kling AI's official Open Platform API.
  */
 
-const VIDEO_API_KEY = (process.env.VIDEO_API_KEY || "").trim(); // Format: "ACCESS_KEY:SECRET_KEY"
-
-function generateKlingToken() {
-  if (!VIDEO_API_KEY || !VIDEO_API_KEY.includes(':')) {
-    throw new Error("Invalid VIDEO_API_KEY format. Expected 'ACCESS_KEY:SECRET_KEY'");
-  }
-
-  const [ak, sk] = VIDEO_API_KEY.split(':');
-  
+function generateKlingToken(ak: string, sk: string) {
   const header = { alg: "HS256", typ: "JWT" };
   const payload = {
     iss: ak,
@@ -41,7 +33,16 @@ function generateKlingToken() {
 }
 
 export async function startVideoGeneration(prompt: string, type: 'text' | 'image', imageUrl?: string) {
-  const token = generateKlingToken();
+  const videoKey = (process.env.VIDEO_API_KEY || "").trim();
+  
+  if (!videoKey || !videoKey.includes(':')) {
+    console.error("DEBUG: VIDEO_API_KEY is missing or invalid format.");
+    throw new Error("Invalid or missing VIDEO_API_KEY. Expected 'ACCESS_KEY:SECRET_KEY'");
+  }
+
+  const [ak, sk] = videoKey.split(':');
+  console.log(`DEBUG: Using AK: ${ak.substring(0,4)}...${ak.substring(ak.length-4)}`);
+  const token = generateKlingToken(ak, sk);
   
   const endpoint = type === 'image' 
     ? "https://api.klingai.com/v1/videos/image2video"
@@ -58,7 +59,7 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
   if (type === 'image' && imageUrl) {
     payload.image = imageUrl;
   }
-
+  
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -71,7 +72,7 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
   const result = await response.json();
 
   if (!response.ok) {
-    console.error("Kling AI Submission Error:", result);
+    console.error("Kling AI API Error Response:", JSON.stringify(result));
     throw new Error(result.message || result.error?.message || "Kling AI failed to start generation.");
   }
 
@@ -79,7 +80,12 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
 }
 
 export async function getVideoStatus(requestId: string) {
-  const token = generateKlingToken();
+  const videoKey = (process.env.VIDEO_API_KEY || "").trim();
+  if (!videoKey || !videoKey.includes(':')) throw new Error("API Key missing or invalid.");
+  
+  const [ak, sk] = videoKey.split(':');
+  const token = generateKlingToken(ak, sk);
+  
   const statusEndpoint = `https://api.klingai.com/v1/videos/text2video/${requestId}`;
   
   const response = await fetch(statusEndpoint, {
@@ -98,7 +104,6 @@ export async function getVideoStatus(requestId: string) {
   const result = await response.json();
   const data = result.data || result;
 
-  // Kling Open Platform statuses: submitted, processing, succeed, failed
   if (data.task_status === "succeed") {
     const videoUrl = data.task_result?.videos?.[0]?.url || data.video_url;
     return { status: "COMPLETED", videoUrl };

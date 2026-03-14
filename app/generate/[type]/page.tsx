@@ -9,52 +9,17 @@ import { Sparkles, Video, Image as ImageIcon, Mic, ArrowRight, Download, Share2,
 
 // Voice options for Text-to-Speech (ElevenLabs voice IDs)
 const VOICE_OPTIONS = [
-  // Female - North America
-  { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel", category: "Female", desc: "Calm, natural American" },
-  { id: "EXAVITQu4vr4xnSDxMaL", name: "Bella", category: "Female", desc: "Soft, warm & friendly" },
-  { id: "MF3mGyEYCl7XYWbV9V6O", name: "Elli", category: "Female", desc: "Young, expressive American" },
-  { id: "AZnzlk1XvdvUeBnXmlld", name: "Domi", category: "Female", desc: "Confident & bold" },
-  { id: "ThT5KcBeYPX3keUQqHPh", name: "Lily", category: "Female", desc: "Bright narration" },
-  { id: "piTKgc9n4Y1f6S7S6S8S", name: "Samantha", category: "Female", desc: "Professional, corporate" },
-  { id: "Lcf7u3S7Y8S6F7S4G9S1", name: "Audrey", category: "Female", desc: "Mid-Atlantic, sophisticated" },
+  // Female
+  { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel", category: "Female", desc: "Narration, American" },
+  { id: "EXAVITQu4vr4xnSDxMaL", name: "Bella", category: "Female", desc: "Soft, friendly American" },
+  { id: "AZnzlk1XvdvUeBnXmlld", name: "Domi", category: "Female", desc: "Strong, confident American" },
+  { id: "MF3mGyEYCl7XYWbV9V6O", name: "Elli", category: "Female", desc: "Young, clear American" },
   
-  // Male - North America
-  { id: "29vD33N1CtxCmqQRPOHJ", name: "Drew", category: "Male", desc: "Deep, authoritative" },
-  { id: "VR6AewLTigWG4xSOukaG", name: "Arnold", category: "Male", desc: "Strong, cinematic hero" },
-  { id: "ErXwobaYiN019PkySvjV", name: "Antoni", category: "Male", desc: "Warm, conversational" },
-  { id: "yoZ06aMxZJJ28mfd3POQ", name: "Sam", category: "Male", desc: "Smooth narrator" },
-  { id: "TxGEqnHWrfWFTfGW9XjX", name: "Josh", category: "Male", desc: "Energetic, young" },
-  { id: "ODq5zmih8GrVes37Dizd", name: "Patrick", category: "Male", desc: "Charismatic storyteller" },
-  { id: "N2lVS1wzXK9X2C3X4C5X", name: "Bill", category: "Male", desc: "Trustworthy, mature" },
-
-  // British / European
-  { id: "jBpfAFnaylXS5xSbITun", name: "Freya", category: "Female", desc: "Elegant, refined British" },
-  { id: "jsCqWAovK2LkecY7zXl4", name: "Dorothy", category: "Female", desc: "Classic British lady" },
-  { id: "ZQe5CZNOzWyzPSCn5a3c", name: "James", category: "Male", desc: "Smooth British gentleman" },
-  { id: "Xp3nS4Y5T9X1R2C3X4X5", name: "Oliver", category: "Male", desc: "Youthful British" },
-  { id: "Hans_DE", name: "Hans", category: "International", desc: "Deep German accent" },
-  { id: "Pierre_FR", name: "Pierre", category: "International", desc: "Soft French accent" },
-  { id: "Lorenzo_IT", name: "Lorenzo", category: "International", desc: "Passionate Italian" },
-  { id: "Mateo_ES", name: "Mateo", category: "International", desc: "Clear Spanish voice" },
-
-  // Indian Accents
-  { id: "Aditi_IN", name: "Aditi", category: "International", desc: "Fluent, mild Indian Accent" },
-  { id: "Vikram_IN", name: "Vikram", category: "International", desc: "Professional Indian Male" },
-  { id: "Ananya_HI", name: "Ananya", category: "International", desc: "Hindi Accent Female" },
-  { id: "Arjun_HI", name: "Arjun", category: "International", desc: "Hindi Accent Male" },
-
-  // Characters
-  { id: "Thomas_Wise", name: "Thomas", category: "Character", desc: "Calm, wise elder" },
-  { id: "Harry_Animated", name: "Harry", category: "Character", desc: "Lively, animated" },
-  { id: "Gnome_Mystical", name: "Gnome", category: "Character", desc: "High pitched, mystical" },
-  { id: "Orc_Gritty", name: "Orc", category: "Character", desc: "Gritty, deep growl" },
-  { id: "Robo_Bot", name: "Robo-7", category: "Character", desc: "Flat, robotic monotone" },
-
-  // Specialty & News
-  { id: "Michael_News", name: "Michael", category: "Specialty", desc: "Newscast male" },
-  { id: "Jessica_News", name: "Jessica", category: "Specialty", desc: "Newscast female" },
-  { id: "Logan_Promo", name: "Logan", category: "Specialty", desc: "Exciting promo voice" },
-  { id: "Asher_ASMR", name: "Asher", category: "Specialty", desc: "Low-frequency ASMR" }
+  // Male
+  { id: "ErXwobaYiN019PkySvjV", name: "Antoni", category: "Male", desc: "Well-rounded, American" },
+  { id: "TxGEqnHWrfWFTfGW9XjX", name: "Josh", category: "Male", desc: "Energetic, deep American" },
+  { id: "VR6AewLTigWG4xSOukaG", name: "Arnold", category: "Male", desc: "Strong, deep American" },
+  { id: "yoZ06aMxZJJ28mfd3POQ", name: "Sam", category: "Male", desc: "Narration, American" }
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -68,7 +33,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 function GeneratePageContent({ type }: { type: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, isLoading, deductCredit, addHistoryItem } = useAuth();
+  const { user, status, isLoading, deductCredit, addHistoryItem } = useAuth();
   
   const initialPrompt = searchParams.get('prompt') || "";
   const [prompt, setPrompt] = useState(initialPrompt);
@@ -131,7 +96,7 @@ function GeneratePageContent({ type }: { type: string }) {
   const hasEnoughCredits = user && (user.credits + user.dailyFreeCredits) >= cost;
 
   const handleGenerate = async () => {
-    if (!user) {
+    if (status !== "authenticated") {
       setShowAuthModal(true);
       return;
     }

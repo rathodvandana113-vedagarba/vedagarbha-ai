@@ -102,8 +102,12 @@ const Navbar = () => {
                 <button
                   key={item.path}
                   onClick={() => {
-                    if (!user) setIsAuthOpen(true);
-                    else router.push(item.path);
+                    if (status !== "authenticated") {
+                      // Trigger modal in parent if possible, or just push to home
+                      router.push('/');
+                    } else {
+                      router.push(item.path);
+                    }
                   }}
                   className="w-full flex items-center justify-between px-5 py-4 text-[#8E8E93] hover:text-white hover:bg-white/5 rounded-2xl transition-all font-bold text-sm text-left group/item"
                 >
@@ -232,7 +236,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+      {/* No internal modal here to avoid duplicates */}
     </header>
   );
 };
