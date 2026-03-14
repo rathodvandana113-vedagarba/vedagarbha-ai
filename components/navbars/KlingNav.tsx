@@ -125,14 +125,14 @@ const Navbar = () => {
         </nav>
 
         {/* Right Section */}
-        <div className="flex items-center gap-1.5 sm:gap-6">
+        <div className="flex items-center gap-1 sm:gap-6">
           {user ? (
             <div className="flex items-center gap-2 sm:gap-6">
                <div className="hidden sm:flex flex-col items-end">
-                <span className="text-xs font-bold text-white tracking-widest text-glow">
+                <span className="text-[10px] font-bold text-white tracking-widest text-glow">
                   {user.credits + user.dailyFreeCredits} CREDITS
                 </span>
-                <div className="w-16 h-1 bg-white/5 rounded-full overflow-hidden mt-1 mt-1 border border-white/5">
+                <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden mt-1 mt-1 border border-white/5">
                   <div
                     className="h-full bg-gradient-to-r from-white to-[#3B82F6] shadow-[0_0_5px_white]"
                     style={{ width: `${Math.min(100, ((user.credits + user.dailyFreeCredits) / 100) * 100)}%` }}
@@ -141,8 +141,8 @@ const Navbar = () => {
               </div>
 
               <div className="relative group/user">
-                 <button className="flex items-center gap-1.5 sm:gap-3 glass-card bg-white/5 border border-white/10 px-2 py-1 sm:px-4 sm:py-2 hover:bg-white/10 transition-all">
-                  <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-white to-[#3B82F6] flex items-center justify-center text-[9px] sm:text-[11px] text-black font-black uppercase shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+                 <button className="flex items-center gap-1 sm:gap-3 glass-card bg-white/5 border border-white/10 px-1.5 py-1 sm:px-4 sm:py-2 hover:bg-white/10 transition-all">
+                  <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-white to-[#3B82F6] flex items-center justify-center text-[8px] sm:text-[11px] text-black font-black uppercase shadow-[0_0_10px_rgba(255,255,255,0.4)]">
                     {user.name.charAt(0)}
                   </div>
                   <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
@@ -165,7 +165,7 @@ const Navbar = () => {
               </button>
                <button
                 onClick={() => setIsAuthOpen(true)}
-                className="glass-card bg-white text-black px-2 py-1.5 sm:px-8 sm:py-3.5 font-black text-[8px] sm:text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center gap-1 sm:gap-2"
+                className="glass-card bg-white text-black px-1.5 py-1 sm:px-8 sm:py-3.5 font-black text-[7px] sm:text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center gap-1 sm:gap-2"
               >
                 Sign Up
               </button>
