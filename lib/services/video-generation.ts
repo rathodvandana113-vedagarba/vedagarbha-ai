@@ -83,8 +83,8 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
     console.error("Kling AI API Error Response:", JSON.stringify(result));
     
     // Help user with Access Key issues
-    if (result.code === 401 || result.message?.toLowerCase().includes("access key")) {
-       throw new Error("Kling AI Auth Failed: Please ensure your API key is in 'ACCESS_KEY:SECRET_KEY' format in Vercel.");
+    if (result.code === 401 || result.message?.toLowerCase().includes("access key") || result.message?.toLowerCase().includes("auth")) {
+       throw new Error(`Kling AI Auth Failed (${result.code}): Please ensure your VIDEO_API_KEY is stored as 'ACCESS_KEY:SECRET_KEY' in Vercel. Current format: ${videoKey.includes(':') ? 'AK:SK (Correct)' : 'Direct Token (Likely Incorrect)'}`);
     }
 
     throw new Error(result.message || "Kling AI failed to start. Check your account balance/quota.");

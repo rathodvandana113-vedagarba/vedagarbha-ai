@@ -8,17 +8,10 @@ import AuthModal from '@/components/auth/AuthModal';
 import { Sparkles, Video, Image as ImageIcon, Mic, ArrowRight, Download, Share2, Settings, History, Info, ChevronLeft, Filter, Check, Copy } from 'lucide-react';
 
 // Voice options for Text-to-Speech (ElevenLabs voice IDs)
+// Verified free-tier voices for ElevenLabs
 const VOICE_OPTIONS = [
-  // Female
-  { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel", category: "Female", desc: "Narration, American" },
-  { id: "EXAVITQu4vr4xnSDxMaL", name: "Bella", category: "Female", desc: "Soft, friendly American" },
-  { id: "AZnzlk1XvdvUeBnXmlld", name: "Domi", category: "Female", desc: "Strong, confident American" },
-  { id: "MF3mGyEYCl7XYWbV9V6O", name: "Elli", category: "Female", desc: "Young, clear American" },
-  
-  // Male
-  { id: "pNInz6obpgDQGcFmaJgB", name: "Adam", category: "Male", desc: "Deep narration, American" },
-  { id: "ErXwobaYiN019PkySvjV", name: "Antoni", category: "Male", desc: "Well-rounded, American" },
-  { id: "VR6AewLTigWG4xSOukaG", name: "Arnold", category: "Male", desc: "Strong, deep American" }
+  { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel", category: "Female", desc: "American, Narrator" },
+  { id: "pNInz6obpgDQGcFmaJgB", name: "Adam", category: "Male", desc: "American, Deep Narration" }
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -48,7 +41,7 @@ function GeneratePageContent({ type }: { type: string }) {
   const [aspectRatio, setAspectRatio] = useState<"16:9" | "9:16" | "1:1">("16:9");
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[4].id); // Adam id is at index 4 now
+  const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[1].id); // Adam default
   const [voiceFilter, setVoiceFilter] = useState<string>("All");
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
