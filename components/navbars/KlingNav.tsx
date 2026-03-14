@@ -236,7 +236,11 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* No internal modal here to avoid duplicates */}
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthOpen} 
+        onClose={() => setIsAuthOpen(false)} 
+      />
     </header>
   );
 };

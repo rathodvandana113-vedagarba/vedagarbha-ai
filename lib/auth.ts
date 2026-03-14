@@ -1,10 +1,52 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import AppleProvider from "next-auth/providers/apple";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }),
+    AppleProvider({
+      clientId: process.env.APPLE_ID || "",
+      clientSecret: process.env.APPLE_SECRET || "",
+    }),
+    CredentialsProvider({
+      id: "phone",
+      name: "phone",
+      credentials: {
+        phone: { label: "Phone", type: "text" },
+        otp: { label: "OTP", type: "text" },
+      },
+      async authorize(credentials) {
+        // Real implementation would verify OTP here via SMS service
+        if (credentials?.otp === "123456") { // Simulated OTP for testing
+          const user = (await prisma.user.findFirst({
+            where: { email: `${credentials.phone}@phone.com` }, // Shadow email for phone users
+          })) as any;
+
+          if (!user) {
+            // Auto-create user for phone if not exists
+            const newUser = await (prisma.user as any).create({
+              data: {
+                email: `${credentials.phone}@phone.com`,
+                name: `User ${credentials.phone.slice(-4)}`,
+                passwordHash: "phone-login", // Placeholder
+                credits: 10,
+                status: "active"
+              }
+            });
+            return { id: newUser.id, name: newUser.name, email: newUser.email };
+          }
+          return { id: user.id, name: user.name, email: user.email };
+        }
+        throw new Error("Invalid OTP");
+      }
+    }),
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -30,9 +72,9 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
+          id: (user as any).id,
+          name: (user as any).name,
+          email: (user as any).email,
         };
       },
     }),
