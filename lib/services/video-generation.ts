@@ -7,11 +7,11 @@ import crypto from 'crypto';
  */
 
 export async function startVideoGeneration(prompt: string, type: 'text' | 'image', imageUrl?: string) {
-  const videoKey = (process.env.VIDEO_API_KEY || "").trim();
+  const videoKey = (process.env.VIDEO_API_KEY || process.env.FAL_KEY || "").trim();
   
   if (!videoKey) {
-    console.error("CRITICAL: VIDEO_API_KEY is EMPTY in environment variables.");
-    throw new Error("VIDEO_API_KEY is missing. Please add it to Vercel Settings.");
+    console.error("CRITICAL: VIDEO_API_KEY or FAL_KEY is EMPTY in environment variables.");
+    throw new Error("Video API key is missing. Please add VIDEO_API_KEY or FAL_KEY to Vercel Settings.");
   }
 
   // fal.ai key is used as 'Key KEY_ID:KEY_SECRET'
@@ -61,7 +61,7 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
 }
 
 export async function getVideoStatus(requestId: string) {
-  const videoKey = (process.env.VIDEO_API_KEY || "").trim();
+  const videoKey = (process.env.VIDEO_API_KEY || process.env.FAL_KEY || "").trim();
   if (!videoKey) throw new Error("API Key missing.");
   
   const authHeader = `Key ${videoKey}`;
