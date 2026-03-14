@@ -128,28 +128,35 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </p>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex mx-8 mb-4 bg-white/5 rounded-xl border border-white/10 p-1 gap-1">
-          {(["login", "signup", "phone"] as const).map(t => (
+        {/* Tab Switcher - Simple Email flow */}
+        <div className="flex mx-8 mb-6 bg-white/5 rounded-xl border border-white/10 p-1 gap-1">
+          {(["login", "signup"] as const).map(t => (
             <button key={t} onClick={() => { setTab(t); setOtpSent(false); }}
-              className={`flex-1 py-3 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${tab === t ? "bg-white text-black shadow-lg" : "text-gray-500 hover:text-white"}`}>
-              {t === "login" ? "Log In" : t === "signup" ? "Sign Up" : "Phone"}
+              className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${tab === t ? "bg-white text-black shadow-lg" : "text-gray-500 hover:text-white"}`}>
+              {t === "login" ? "Log In" : "Sign Up"}
             </button>
           ))}
         </div>
 
         <div className="px-8 pb-8">
-          {/* Social Logins */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <button onClick={() => handleSocialLogin('google')} className="flex items-center justify-center gap-3 py-3.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20 transition-all group overflow-hidden">
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-4 h-4" alt="Google" />
-              <span className="text-[11px] font-black text-white uppercase tracking-widest">Google</span>
+          {/* Quick Auth Row - 3 Columns */}
+          <div className="grid grid-cols-3 gap-2 mb-8">
+            <button onClick={() => { setTab("phone"); setOtpSent(false); }} 
+              className={`flex flex-col items-center justify-center gap-2 py-3.5 rounded-xl border transition-all group ${tab === 'phone' ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}>
+              <Phone size={14} className={tab === 'phone' ? 'text-black' : 'text-gray-400 group-hover:text-white'} />
+              <span className="text-[9px] font-black uppercase tracking-widest">Mobile</span>
             </button>
-            <button onClick={() => handleSocialLogin('apple')} className="flex items-center justify-center gap-3 py-3.5 rounded-xl bg-white text-black hover:bg-gray-100 transition-all group overflow-hidden">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+            <button onClick={() => handleSocialLogin('google')} 
+              className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all group">
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-3.5 h-3.5" alt="Google" />
+              <span className="text-[9px] font-black uppercase tracking-widest">Google</span>
+            </button>
+            <button onClick={() => handleSocialLogin('apple')} 
+              className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all group">
+              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.062 13.917c.015 3.123 2.71 4.14 2.73 4.15-.022.072-.428 1.467-1.442 2.94-.877 1.272-1.788 2.54-3.208 2.566-1.396.026-1.847-.824-3.444-.824-1.6 0-2.098.803-3.418.853-1.373.05-2.404-1.37-3.287-2.642-1.808-2.61-3.19-7.37-1.32-10.612.928-1.61 2.585-2.616 4.385-2.642 1.373-.025 2.668.932 3.512.932.844 0 2.408-1.157 4.028-.992.678.028 2.583.272 3.805 2.062-.1-.06-.15.088-.15.424zM14.925 5.253c.71-.86 1.187-2.054 1.056-3.253-1.03.04-2.275.684-3.013 1.543-.66.758-1.238 1.968-1.082 3.142 1.15.088 2.328-.57 3.039-1.432z" />
               </svg>
-              <span className="text-[11px] font-black uppercase tracking-widest">Apple</span>
+              <span className="text-[9px] font-black uppercase tracking-widest">Apple</span>
             </button>
           </div>
 
