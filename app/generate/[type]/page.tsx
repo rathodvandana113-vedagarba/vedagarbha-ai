@@ -103,9 +103,13 @@ function GeneratePageContent({ type }: { type: string }) {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      setShowAuthModal(true);
-    }
+    // Add a small delay to avoid flicker during navigation
+    const timer = setTimeout(() => {
+      if (!isLoading && !user) {
+        setShowAuthModal(true);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
   }, [user, isLoading]);
 
   const toolTitles: Record<string, string> = {
@@ -167,7 +171,7 @@ function GeneratePageContent({ type }: { type: string }) {
     }
   };
 
-  if (isLoading || !user) return <div className="flex items-center justify-center h-screen bg-[#070708] text-white font-bold tracking-widest animate-pulse">LOADING WORKSPACE...</div>;
+  if (isLoading) return <div className="flex items-center justify-center h-screen bg-[#070708] text-white font-bold tracking-widest animate-pulse">LOADING WORKSPACE...</div>;
 
   return (
     <div className="flex flex-col h-[100dvh] bg-[#070708] text-white font-sans overflow-hidden">
@@ -313,7 +317,7 @@ function GeneratePageContent({ type }: { type: string }) {
              <div className="flex items-center gap-3">
                 <div className="px-5 py-2 rounded-full bg-white/5 border border-white/10 flex items-center gap-3">
                   <span className="text-[10px] font-black text-gray-500 uppercase">Available Credits</span>
-                  <span className="text-sm font-bold text-white">{user?.credits + user?.dailyFreeCredits}</span>
+                  <span className="text-sm font-bold text-white">{(user?.credits || 0) + (user?.dailyFreeCredits || 0)}</span>
                 </div>
                 <button onClick={() => router.push('/pricing')} className="px-5 py-2 rounded-full bg-white text-black font-black text-xs hover:bg-[#3B82F6] hover:text-white transition-all">RECHARGE</button>
              </div>

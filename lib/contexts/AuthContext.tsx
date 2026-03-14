@@ -59,14 +59,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (status === "loading") return;
+    const initAuth = async () => {
+      if (status === "loading") return;
 
-    if (session?.user) {
-      fetchUserProfile();
-    } else {
-      setUser(null);
-    }
-    setIsLoading(false);
+      if (session?.user) {
+        await fetchUserProfile();
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    };
+
+    initAuth();
   }, [session, status, fetchUserProfile]);
 
   // REAL login with email + password

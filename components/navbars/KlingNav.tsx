@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/contexts/AuthContext";
 import AuthModal from "@/components/auth/AuthModal";
 
@@ -13,12 +13,8 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
+  const router = useRouter();
+  
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Pricing", path: "/pricing" },
@@ -107,7 +103,7 @@ const Navbar = () => {
                   key={item.path}
                   onClick={() => {
                     if (!user) setIsAuthOpen(true);
-                    else window.location.href = item.path;
+                    else router.push(item.path);
                   }}
                   className="w-full flex items-center justify-between px-5 py-4 text-[#8E8E93] hover:text-white hover:bg-white/5 rounded-2xl transition-all font-bold text-sm text-left group/item"
                 >

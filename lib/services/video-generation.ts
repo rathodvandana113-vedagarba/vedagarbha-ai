@@ -1,12 +1,7 @@
 /**
  * AI Video Generation Service 
  * ===========================
- * This module acts as the pluggable layer for Video APIs (e.g. Kling API, Runway, Pika).
- * 
- * INTEGRATION INSTRUCTIONS:
- * 1. Add VIDEO_API_KEY to your .env.local file.
- * 2. Replace the fetch URL below with your chosen video generation provider.
- * 3. Map the returned JSON payload to match the `videoUrl` structure.
+ * Using Fal.ai's Kling 1.6 video generation with Polling to prevent timeouts.
  */
 
 export async function generateVideo(prompt: string, type: 'text' | 'image', imageUrl?: string) {
@@ -22,7 +17,7 @@ export async function generateVideo(prompt: string, type: 'text' | 'image', imag
     : "https://queue.fal.run/fal-ai/kling-video/v1.6/standard/text-to-video";
 
   const payload: any = {
-    prompt: prompt,
+    prompt: prompt.trim(),
     aspect_ratio: "16:9",
   };
 
@@ -30,8 +25,8 @@ export async function generateVideo(prompt: string, type: 'text' | 'image', imag
     payload.image_url = imageUrl;
   }
 
-  // We await the result via Fal's queue system
-  const response = await fetch(endpoint.replace('queue.', ''), {
+  // 1. Submit to queue
+  const queueRes = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -40,28 +35,55 @@ export async function generateVideo(prompt: string, type: 'text' | 'image', imag
     body: JSON.stringify(payload)
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("Fal.ai Video API Error:", errorText);
-    
-    let errorMessage = "Video generation failed.";
-    try {
-      const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson.detail || errorJson.message || errorMessage;
-    } catch (e) {}
-
-    throw new Error(`${errorMessage} (Status: ${response.status})`);
+  if (!queueRes.ok) {
+    const errorText = await queueRes.text();
+    console.error("Fal.ai Queue Error:", errorText);
+    throw new Error("Failed to start video generation. Check your API key and balance.");
   }
 
-  const result = await response.json();
-  const resultUrl = result.video?.url || result.data?.[0]?.url;
-  return {
-    success: true,
-    data: {
-      videoUrl: resultUrl, // Keep for backward compat
-      resultUrl,
-      prompt, 
-      type
+  const { request_id } = await queueRes.json();
+  const statusEndpoint = `https://queue.fal.run/fal-ai/kling-video/v1.6/standard/requests/${request_id}`;
+
+  // 2. Poll for result (Kling can take 2-5 minutes)
+  let attempts = 0;
+  const maxAttempts = 60; // 5 minutes (5s interval)
+  
+  while (attempts < maxAttempts) {
+    attempts++;
+    console.log(`Polling for video (${request_id})... Attempt ${attempts}`);
+    
+    const statusRes = await fetch(statusEndpoint, {
+      headers: { 'Authorization': `Key ${apiKey}` }
+    });
+    
+    if (!statusRes.ok) {
+      throw new Error("Error checking video generation status.");
     }
-  };
+    
+    const status = await statusRes.json();
+    
+    if (status.status === "COMPLETED") {
+      const resultUrl = status.video?.url || status.data?.[0]?.url || status.url;
+      if (!resultUrl) throw new Error("Video generation completed but no URL was found.");
+      
+      return {
+        success: true,
+        data: {
+          videoUrl: resultUrl,
+          resultUrl,
+          prompt,
+          type
+        }
+      };
+    }
+    
+    if (status.status === "FAILED") {
+      throw new Error("Video generation failed at the provider level.");
+    }
+    
+    // Wait 5 seconds before next poll
+    await new Promise(r => setTimeout(r, 5000));
+  }
+
+  throw new Error("Video generation timed out. Please try again later.");
 }
