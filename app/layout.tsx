@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import AnimatedBackground from "@/components/ui/AnimatedBackground";
+import Providers from "@/components/Providers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const space = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
@@ -19,16 +20,14 @@ export const viewport = {
   userScalable: false,
 };
 
-import { AuthProvider } from "@/lib/contexts/AuthContext";
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${space.variable} antialiased selection:bg-[#3B82F6]/30 selection:text-white`}>
-        <AuthProvider>
+        <Providers>
           <AnimatedBackground />
           {children}
-        </AuthProvider>
+        </Providers>
       </body>
     </html>
   );
