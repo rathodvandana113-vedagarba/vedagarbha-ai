@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import AnimatedBackground from "@/components/ui/AnimatedBackground";
-<<<<<<< HEAD
-=======
 import Providers from "@/components/Providers";
->>>>>>> origin/main
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const space = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
@@ -23,11 +20,6 @@ export const viewport = {
   userScalable: false,
 };
 
-<<<<<<< HEAD
-import Providers from "@/components/Providers";
-
-=======
->>>>>>> origin/main
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>

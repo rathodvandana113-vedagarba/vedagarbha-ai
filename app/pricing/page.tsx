@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Navbar from '@/components/navbars/KlingNav';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
-import StudentVerificationModal from '../../components/auth/StudentVerificationModal';
+import StudentVerificationModal from '@/components/auth/StudentVerificationModal';
 import Script from 'next/script';
 import { Sparkles, Zap, Shield, Cpu, ArrowRight, Check, GraduationCap } from 'lucide-react';
 
@@ -260,11 +260,7 @@ export default function PricingPage() {
 
                    <button 
                      onClick={handleCheckout}
-<<<<<<< HEAD
-                     className="glass-card bg-white text-black px-8 py-5 rounded-[22px] font-black text-lg uppercase tracking-[0.2em] shadow-[0_20px_50px_rgba(255,255,255,0.1)] hover:shadow-[0_25px_60px_rgba(255,255,255,0.2)] hover:-translate-y-2 transition-all group flex items-center justify-center gap-3 mt-4"
-=======
                      className="bg-white text-black px-8 py-5 rounded-[22px] font-black text-lg uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(255,255,255,0.8)] hover:shadow-[0_0_40px_rgba(255,255,255,1)] hover:-translate-y-2 transition-all group flex items-center justify-center gap-3 mt-4"
->>>>>>> origin/main
                    >
                      Complete Order <ArrowRight className="group-hover:translate-x-2 transition-transform" />
                    </button>

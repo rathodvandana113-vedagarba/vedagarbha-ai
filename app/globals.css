@@ -38,23 +38,12 @@ body {
 /* Glass UI Component */
 .glass {
   background: var(--glass);
-<<<<<<< HEAD
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-=======
   backdrop-filter: blur(8px) saturate(180%);
   -webkit-backdrop-filter: blur(8px) saturate(180%);
->>>>>>> origin/main
   border: 1px solid var(--glass-border);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.82);
 }
 
-<<<<<<< HEAD
-.glass-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-=======
 @media (min-width: 768px) {
   .glass {
     backdrop-filter: blur(20px) saturate(180%);
@@ -66,7 +55,6 @@ body {
   background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
->>>>>>> origin/main
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   position: relative;
@@ -74,11 +62,6 @@ body {
   transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease;
 }
 
-<<<<<<< HEAD
-.glass-card:hover {
-  transform: translateY(-8px) scale(1.02) rotateX(5deg);
-  box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.2);
-=======
 @media (min-width: 768px) {
   .glass-card {
     backdrop-filter: blur(15px);
@@ -96,7 +79,6 @@ body {
     transform: translateY(-8px) scale(1.02) rotateX(5deg);
     box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.2);
   }
->>>>>>> origin/main
 }
 
 .glass-card::before {
@@ -168,9 +150,6 @@ body {
   opacity: 0.15;
   pointer-events: none;
   z-index: 100;
-<<<<<<< HEAD
-  animation: noise 2s steps(8) infinite;
-=======
   animation: noise 5s steps(8) infinite; /* Slowed down for performance */
 }
 
@@ -178,7 +157,6 @@ body {
   .noise-bg {
     animation: none; /* Disable movement on mobile to save CPU/Battery */
   }
->>>>>>> origin/main
 }
 
 .gradient-text {
@@ -227,4 +205,3 @@ body {
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
-
