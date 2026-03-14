@@ -35,8 +35,8 @@ export async function generateImage(prompt: string, aspectRatio: string) {
   }
 
   // ==== REAL REPLICATE INTEGRATION ====
-  // Using model-based API (always uses latest version automatically)
-  const response = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
+  // Using FLUX Dev for high-quality, prompt-accurate images
+  const response = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-dev/predictions', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
