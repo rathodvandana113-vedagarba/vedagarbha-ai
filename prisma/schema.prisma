@@ -8,10 +8,15 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(uuid())
-  email          String   @unique
+  id             String    @id @default(uuid())
+  name           String?
+  email          String    @unique
   passwordHash   String
-  credits        Int      @default(0)
-  role           String   @default("USER")
-  createdAt      DateTime @default(now())
+  credits        Float     @default(10)
+  dailyFreeCredits Float   @default(3)
+  lastClaimDate  String?
+  studentStatus  String    @default("none")
+  role           String    @default("USER")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }

@@ -10,10 +10,10 @@
  */
 
 export async function generateVoice(text: string, voiceId?: string) {
-  const apiKey = process.env.ELEVENLABS_API_KEY;
+  const apiKey = (process.env.ELEVENLABS_API_KEY || process.env.VOICE_API_KEY || "").trim();
 
   if (!apiKey) {
-    console.warn("[ELEVENLABS_API_KEY] NOT FOUND - FALLBACK TO MOCK");
+    console.warn("[VOICE_API_KEY] NOT FOUND - FALLBACK TO MOCK");
     // Simulate API delay
     await new Promise(r => setTimeout(r, 1500));
     const resultUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
@@ -40,15 +40,30 @@ export async function generateVoice(text: string, voiceId?: string) {
     },
     body: JSON.stringify({
       text: text,
-      model_id: "eleven_monolingual_v1",
-      voice_settings: { stability: 0.5, similarity_boost: 0.5 }
+      model_id: "eleven_multilingual_v2", // Upgraded for much better quality and accuracy
+      voice_settings: { 
+        stability: 0.55, 
+        similarity_boost: 0.75,
+        use_speaker_boost: true
+      }
     })
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("ElevenLabs API Error:", errorText);
-    throw new Error(`Voice generation failed: ${response.statusText}`);
+    console.error(`ElevenLabs API Error (Status ${response.status}):`, errorText);
+    
+    let errorMessage = "Voice generation failed.";
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.detail?.message || errorJson.message || errorMessage;
+    } catch (e) {}
+
+    if (response.status === 402) {
+      errorMessage = "ElevenLabs: Payment Required or Quota Exceeded. You may have reached your free character limit.";
+    }
+
+    throw new Error(`${errorMessage} (Status: ${response.status})`);
   }
 
   // Convert binary audio buffer to Base64 data URL

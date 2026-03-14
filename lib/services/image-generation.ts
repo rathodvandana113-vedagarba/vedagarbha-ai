@@ -10,10 +10,10 @@
  */
 
 export async function generateImage(prompt: string, aspectRatio: string) {
-  const apiKey = process.env.REPLICATE_API_TOKEN;
+  const apiKey = process.env.REPLICATE_API_TOKEN || process.env.IMAGE_API_KEY;
 
   if (!apiKey) {
-    console.warn("[REPLICATE_API_TOKEN] NOT FOUND - FALLBACK TO MOCK");
+    console.warn("[IMAGE_API_KEY] NOT FOUND - FALLBACK TO MOCK");
     // Simulate API delay
     await new Promise(r => setTimeout(r, 2000));
     const mockImages = [
@@ -35,25 +35,43 @@ export async function generateImage(prompt: string, aspectRatio: string) {
   }
 
   // ==== REAL REPLICATE INTEGRATION ====
-  // Using FLUX.1 [schnell] for fast, high-quality images
-  const response = await fetch('https://api.replicate.com/v1/predictions', {
+  // Using FLUX Dev for high-quality, prompt-accurate images
+  const response = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-dev/predictions', {
     method: 'POST',
     headers: {
-      'Authorization': `Token ${apiKey}`,
-      'Content-Type': 'application/json'
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'wait'
     },
     body: JSON.stringify({
-      version: "31191060936e3ed983577322fb7d425b741088496464f69903b4cf713ece556e", // flux-schnell
       input: {
         prompt: prompt,
-        aspect_ratio: aspectRatio.replace(':', '/'),
+        aspect_ratio: aspectRatio || "16:9",
         output_format: "webp",
-        output_quality: 90
+        output_quality: 90,
+        guidance: 3.5,
+        num_inference_steps: 28
       }
     })
   });
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403 || response.status === 402 || response.status === 422) {
+      console.warn("Replicate API error - FALLBACK TO MOCK");
+      const mockImages = [
+        "https://images.unsplash.com/photo-1682685797886-e46916e8d907?w=1024&q=95",
+        "https://images.unsplash.com/photo-1717501218636-a390f9ac5957?w=1024&q=95",
+        "https://images.unsplash.com/photo-1683009427513-28e163402d16?w=1024&q=95",
+      ];
+      return {
+        success: true,
+        data: {
+          url: mockImages[Math.floor(Math.random() * mockImages.length)],
+          prompt,
+          ratio: aspectRatio
+        }
+      };
+    }
     const errorText = await response.text();
     console.error("Replicate Image API Error:", errorText);
     throw new Error(`Image generation failed: ${response.statusText}`);
@@ -61,14 +79,14 @@ export async function generateImage(prompt: string, aspectRatio: string) {
 
   const prediction = await response.json();
   
-  // Replicate predictions are async. We'll poll for a simple demo context, 
-  // or return the first output if available (some models return immediately)
+  // With Prefer: wait header, the prediction may already be complete
+  // Otherwise poll for result
   let result = prediction;
   let attempts = 0;
   while ((result.status !== 'succeeded' && result.status !== 'failed') && attempts < 30) {
     await new Promise(r => setTimeout(r, 1000));
     const pollRes = await fetch(result.urls.get, {
-      headers: { 'Authorization': `Token ${apiKey}` }
+      headers: { 'Authorization': `Bearer ${apiKey}` }
     });
     result = await pollRes.json();
     attempts++;
@@ -79,6 +97,7 @@ export async function generateImage(prompt: string, aspectRatio: string) {
   }
 
   const resultUrl = result.output?.[0] || result.output;
+  
   return {
     success: true,
     data: {

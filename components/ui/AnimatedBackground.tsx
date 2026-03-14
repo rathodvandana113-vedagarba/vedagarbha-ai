@@ -67,8 +67,15 @@ const AnimatedBackground = () => {
     const init = () => {
       resize();
       particles = [];
-      for (let i = 0; i < 100; i++) {
-        particles.push(new Particle());
+      const isMobile = window.innerWidth < 768;
+      const particleCount = isMobile ? 30 : 100;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const p = new Particle();
+        if (isMobile) {
+          p.size *= 1.5; // Larger but fewer for performance
+        }
+        particles.push(p);
       }
     };
 
@@ -94,15 +101,15 @@ const AnimatedBackground = () => {
   return (
     <div className="fixed inset-0 z-[-10] pointer-events-none overflow-hidden bg-[#030303]">
       {/* Grid Overlay */}
-      <div className="grid-overlay opacity-40"></div>
+      <div className="grid-overlay opacity-30 md:opacity-40"></div>
       
       {/* Noise Texture */}
-      <div className="noise-bg"></div>
+      <div className="noise-bg opacity-[0.08] md:opacity-[0.15]"></div>
 
-      {/* Floating Glowing Orbs */}
-      <div className="absolute top-[10%] left-[5%] w-[500px] h-[500px] bg-white rounded-full blur-[160px] opacity-[0.05] animate-float"></div>
-      <div className="absolute bottom-[10%] right-[5%] w-[600px] h-[600px] bg-[#3B82F6] rounded-full blur-[180px] opacity-[0.05] animate-float" style={{ animationDelay: '-3s' }}></div>
-      <div className="absolute top-[40%] right-[20%] w-[300px] h-[300px] bg-white rounded-full blur-[120px] opacity-[0.03] animate-float" style={{ animationDelay: '-1.5s' }}></div>
+      {/* Floating Glowing Orbs - Optimized for Mobile */}
+      <div className="absolute top-[10%] left-[5%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-white rounded-full blur-[80px] md:blur-[160px] opacity-[0.03] md:opacity-[0.05] animate-float"></div>
+      <div className="absolute bottom-[10%] right-[5%] w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[#3B82F6] rounded-full blur-[100px] md:blur-[180px] opacity-[0.03] md:opacity-[0.05] animate-float" style={{ animationDelay: '-3s' }}></div>
+      <div className="hidden md:block absolute top-[40%] right-[20%] w-[300px] h-[300px] bg-white rounded-full blur-[120px] opacity-[0.03] animate-float" style={{ animationDelay: '-1.5s' }}></div>
 
       {/* Particle Canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 opacity-40"></canvas>

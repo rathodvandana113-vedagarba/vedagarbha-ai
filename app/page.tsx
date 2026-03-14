@@ -34,18 +34,32 @@ const SHOWCASE_IMAGES = [
 
 export default function HomePage() {
   const router = useRouter();
+<<<<<<< HEAD
   const { user, status, isAuthOpen, setAuthOpen } = useAuth();
+=======
+  const { user, isAuthOpen, setAuthOpen } = useAuth();
+>>>>>>> origin/main
   const [demoIdx, setDemoIdx] = useState(0);
   const [showcaseIdx, setShowcaseIdx] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+<<<<<<< HEAD
     const int = setInterval(() => {
       setDemoIdx((prev) => (prev + 1) % DEMOS.length);
     }, 6000);
     const showcaseInt = setInterval(() => {
       setShowcaseIdx((prev) => (prev + 1) % 6);
     }, 4000);
+=======
+    // Slower intervals for mobile performance
+    const int = setInterval(() => {
+      setDemoIdx((prev) => (prev + 1) % DEMOS.length);
+    }, 10000); // 10s instead of 6s
+    const showcaseInt = setInterval(() => {
+      setShowcaseIdx((prev) => (prev + 1) % 6);
+    }, 8000); // 8s instead of 4s
+>>>>>>> origin/main
     return () => {
       clearInterval(int);
       clearInterval(showcaseInt);
@@ -53,7 +67,11 @@ export default function HomePage() {
   }, []);
 
   const handleStart = (path: string) => {
+<<<<<<< HEAD
     if (status !== "authenticated") setAuthOpen(true);
+=======
+    if (!user) setAuthOpen(true);
+>>>>>>> origin/main
     else router.push(path);
   };
 
@@ -62,7 +80,11 @@ export default function HomePage() {
       <Navbar />
       
       <main className="relative z-10">
+<<<<<<< HEAD
         <div className="absolute top-[10%] left-[20%] w-[800px] h-[800px] bg-[#3B82F6] rounded-full blur-[200px] opacity-[0.03] z-[-1] animate-float"></div>
+=======
+        <div className="absolute top-[10%] left-[20%] w-[300px] h-[300px] md:w-[800px] md:h-[800px] bg-[#3B82F6] rounded-full blur-[80px] md:blur-[200px] opacity-[0.03] z-[-1] animate-float"></div>
+>>>>>>> origin/main
         
         <div className="max-w-[1440px] mx-auto px-6 md:px-12">
           {/* Hero Section */}
@@ -86,16 +108,27 @@ export default function HomePage() {
                 Vedagarbha AI combines cinematic video synthesis, ultra-realistic image generation, and emotional speech into one immersive crystalline ecosystem.
               </p>
 
+<<<<<<< HEAD
               <div className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start">
                 <button 
                   onClick={() => handleStart("/generate/text-to-video")}
                   className="bg-white text-black px-12 py-5 rounded-[20px] font-black text-lg uppercase tracking-widest shadow-[0_0_80px_rgba(255,255,255,0.5)] hover:shadow-[0_0_100px_rgba(255,255,255,0.7)] hover:-translate-y-2 active:scale-95 transition-all group flex items-center gap-3 ring-[6px] ring-white/40"
+=======
+              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+                <button 
+                  onClick={() => handleStart("/generate/text-to-video")}
+                  className="bg-white text-black px-8 py-3.5 md:px-12 md:py-5 rounded-[20px] font-black text-sm md:text-lg uppercase tracking-widest shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:-translate-y-2 transition-all group flex items-center gap-3 w-full sm:w-auto justify-center ring-[3px] ring-white/40"
+>>>>>>> origin/main
                 >
                   Get Started <ArrowRight className="group-hover:translate-x-2 transition-transform" />
                 </button>
                 <button 
                   onClick={() => document.getElementById('showcase')?.scrollIntoView({ behavior: 'smooth' })}
+<<<<<<< HEAD
                   className="glass bg-white/5 border border-white/10 px-10 py-5 rounded-[20px] font-black text-lg uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-md"
+=======
+                  className="glass bg-white/5 border border-white/10 px-8 py-3.5 md:px-10 md:py-5 rounded-[20px] font-black text-sm md:text-lg uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-md w-full sm:w-auto justify-center text-center"
+>>>>>>> origin/main
                 >
                   Showcase
                 </button>
@@ -163,7 +196,11 @@ export default function HomePage() {
                 </div>
                 <button 
                   onClick={() => setAuthOpen(true)}
+<<<<<<< HEAD
                   className="bg-white text-black px-8 py-4 rounded-full shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:shadow-[0_0_80px_rgba(255,255,255,0.6)] font-black uppercase tracking-[0.2em] text-xs sm:text-sm hover:-translate-y-1 transition-all whitespace-nowrap ring-4 ring-white/50"
+=======
+                  className="glass bg-white/5 px-6 py-3 md:px-8 md:py-4 rounded-full border border-white/10 text-glow font-black uppercase tracking-widest text-[10px] md:text-sm hover:bg-white hover:text-black hover:border-white transition-all whitespace-nowrap"
+>>>>>>> origin/main
                 >
                   Join the Beta ➔
                 </button>
@@ -179,23 +216,39 @@ export default function HomePage() {
                   <div 
                     key={i} 
                     onClick={() => handleStart(item.path)}
+<<<<<<< HEAD
                     className={`glass-card group cursor-pointer ${item.class} flex flex-col justify-end p-10 overflow-hidden relative border border-white/5 hover:border-white/20 transition-all`}
+=======
+                    className={`glass-card group cursor-pointer ${item.class} flex flex-col justify-end p-6 md:p-10 overflow-hidden relative border border-white/5 hover:border-white/20 transition-all`}
+>>>>>>> origin/main
                   >
                      <div className="absolute inset-x-0 bottom-0 top-[40%] bg-gradient-to-t from-[#030303] via-[#030303]/90 to-transparent z-10 transition-all group-hover:top-[20%]"></div>
                      {item.media && (
                         item.isImg ? (
                            <img src={item.media} className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-all duration-[2000ms] group-hover:scale-125 ease-out" alt="Bg"/>
                         ) : (
+<<<<<<< HEAD
                            <video src={item.media} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-all duration-[2000ms] group-hover:scale-125 ease-out" />
+=======
+                           <video src={item.media} poster={SHOWCASE_IMAGES[i]} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-all duration-[2000ms] group-hover:scale-125 ease-out" />
+>>>>>>> origin/main
                         )
                      )}
                      
                      <div className="relative z-20">
+<<<<<<< HEAD
                         <div className="w-14 h-14 glass-card bg-white/5 flex items-center justify-center mb-6 group-hover:bg-white group-hover:text-black transition-all">
                            {item.icon}
                         </div>
                         <h3 className="text-3xl font-black tracking-tighter uppercase mb-2 group-hover:text-[#3B82F6] transition-all">{item.title}</h3>
                         <p className="text-[#A1A1A6] font-bold text-sm tracking-widest">{item.desc}</p>
+=======
+                        <div className="w-12 h-12 md:w-14 md:h-14 glass-card bg-white/5 flex items-center justify-center mb-4 md:mb-6 group-hover:bg-white group-hover:text-black transition-all">
+                           {item.icon}
+                        </div>
+                        <h3 className="text-2xl md:text-3xl font-black tracking-tighter uppercase mb-2 group-hover:text-[#3B82F6] transition-all">{item.title}</h3>
+                        <p className="text-[#A1A1A6] font-bold text-xs md:text-sm tracking-widest">{item.desc}</p>
+>>>>>>> origin/main
                      </div>
                   </div>
                 ))}
@@ -213,7 +266,11 @@ export default function HomePage() {
                 {[...SHOWCASE_VIDEOS, ...SHOWCASE_IMAGES].slice(showcaseIdx, showcaseIdx + 6).map((src, i) => (
                    <div key={`${showcaseIdx}-${i}`} className="glass-card aspect-[4/5] md:aspect-square overflow-hidden group border border-glow transition-all duration-1000 animate-in fade-in zoom-in-95">
                       {src.includes('mixkit') ? (
+<<<<<<< HEAD
                          <video src={src} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-1000" />
+=======
+                         <video src={src} poster={SHOWCASE_IMAGES[i % 6]} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-1000" />
+>>>>>>> origin/main
                       ) : (
                          <img src={src} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-1000" alt="Showcase"/>
                       )}
@@ -249,6 +306,7 @@ export default function HomePage() {
 
                  <div className="flex flex-col gap-4">
                     <span className="text-[10px] font-black text-[#3B82F6] tracking-[0.4em] uppercase opacity-60">Connect & Support</span>
+<<<<<<< HEAD
                     <a href="mailto:support@vedagarbha.ai" className="text-lg font-black text-white hover:text-[#3B82F6] transition-all">support@vedagarbha.ai</a>
                     <p className="text-sm font-bold text-[#8E8E93] leading-relaxed italic">Tech Hub, Silicon Valley of India<br/>Bangalore, KA 560103</p>
                  </div>
@@ -273,6 +331,10 @@ export default function HomePage() {
                         {social.name}
                        </a>
                     ))}
+=======
+                    <a href="mailto:webcraftai.ai@gmail.com" className="text-lg font-black text-white hover:text-[#3B82F6] transition-all">webcraftai.ai@gmail.com</a>
+                    <p className="text-sm font-bold text-[#8E8E93] leading-relaxed italic">Bhavnagar, Gujarat, India 364001</p>
+>>>>>>> origin/main
                  </div>
               </div>
 
@@ -293,20 +355,45 @@ export default function HomePage() {
               </div>
            </div>
            
+<<<<<<< HEAD
            <div className="max-w-[1440px] mx-auto px-10 mt-32 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 opacity-40">
               <span className="text-xs font-black uppercase tracking-[0.4em]">© {new Date().getFullYear()} Vedagarbha Platform</span>
               <div className="flex items-center gap-2">
                  <span className="text-[10px] font-bold uppercase tracking-widest">Powered by</span>
                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#3B82F6]">webcraft-Ai</span>
+=======
+           <div className="max-w-[1440px] mx-auto px-10 mt-32 pt-10 border-t border-white/5 flex flex-col items-center gap-8">
+              <div className="flex items-center gap-6 opacity-60 hover:opacity-100 transition-opacity">
+                 {[
+                   { name: "𝕏", url: "https://x.com", icon: <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.005 4.005H5.059z"/></svg> },
+                   { name: "Instagram", url: "https://instagram.com", icon: <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> },
+                   { name: "YouTube", url: "https://youtube.com", icon: <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg> },
+                   { name: "LinkedIn", url: "https://linkedin.com", icon: <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> }
+                 ].map(social => (
+                    <a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" className="hover:text-[#3B82F6] transition-colors" title={social.name}>
+                       {social.icon}
+                    </a>
+                 ))}
+              </div>
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full opacity-40">
+                 <span className="text-xs font-black uppercase tracking-[0.4em]">© {new Date().getFullYear()} Vedagarbha Platform</span>
+                 <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Powered by</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#3B82F6]">webcraft.in</span>
+                 </div>
+>>>>>>> origin/main
               </div>
            </div>
         </footer>
       </main>
+<<<<<<< HEAD
       
       <AuthModal 
         isOpen={isAuthOpen} 
         onClose={() => setAuthOpen(false)} 
       />
+=======
+>>>>>>> origin/main
     </div>
   );
 }

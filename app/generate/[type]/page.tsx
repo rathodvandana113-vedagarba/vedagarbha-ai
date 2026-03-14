@@ -8,7 +8,9 @@ import AuthModal from '@/components/auth/AuthModal';
 import { Sparkles, Video, Image as ImageIcon, Mic, ArrowRight, Download, Share2, Settings, History, Info, ChevronLeft, Filter, Check, Copy } from 'lucide-react';
 
 // Voice options for Text-to-Speech (ElevenLabs voice IDs)
+// Verified free-tier voices for ElevenLabs
 const VOICE_OPTIONS = [
+<<<<<<< HEAD
   // Female - North America
   { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel", category: "Female", desc: "Calm, natural American" },
   { id: "EXAVITQu4vr4xnSDxMaL", name: "Bella", category: "Female", desc: "Soft, warm & friendly" },
@@ -55,6 +57,10 @@ const VOICE_OPTIONS = [
   { id: "Jessica_News", name: "Jessica", category: "Specialty", desc: "Newscast female" },
   { id: "Logan_Promo", name: "Logan", category: "Specialty", desc: "Exciting promo voice" },
   { id: "Asher_ASMR", name: "Asher", category: "Specialty", desc: "Low-frequency ASMR" }
+=======
+  { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel", category: "Female", desc: "American, Narrator" },
+  { id: "pNInz6obpgDQGcFmaJgB", name: "Adam", category: "Male", desc: "American, Deep Narration" }
+>>>>>>> origin/main
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -68,7 +74,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 function GeneratePageContent({ type }: { type: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, isLoading, deductCredit, addHistoryItem } = useAuth();
+  const { user, status, isLoading, deductCredit, addHistoryItem } = useAuth();
   
   const initialPrompt = searchParams.get('prompt') || "";
   const [prompt, setPrompt] = useState(initialPrompt);
@@ -84,7 +90,7 @@ function GeneratePageContent({ type }: { type: string }) {
   const [aspectRatio, setAspectRatio] = useState<"16:9" | "9:16" | "1:1">("16:9");
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[0].id);
+  const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[1].id); // Adam default
   const [voiceFilter, setVoiceFilter] = useState<string>("All");
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,16 +103,25 @@ function GeneratePageContent({ type }: { type: string }) {
 
   const handleImprovePrompt = () => {
     if (!prompt.trim()) return;
-    setPrompt(prompt + ", Cinematic lighting, dramatic atmosphere, ultra realistic, highly detailed, 4K");
+    setPrompt(prompt.trim() + ", cinematic lighting, dark background, masterpiece, 8k resolution, highly detailed, photorealistic, cinematic composition, moody atmosphere");
   };
 
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+<<<<<<< HEAD
   useEffect(() => {
     if (!isLoading && !user) {
       setShowAuthModal(true);
     }
   }, [user, isLoading]);
+=======
+  // Remove automatic popup to fix persistent modal bug
+  useEffect(() => {
+    if (showAuthModal && user) {
+      setShowAuthModal(false);
+    }
+  }, [user, showAuthModal]);
+>>>>>>> origin/main
 
   const toolTitles: Record<string, string> = {
     'text-to-video': 'Cinematic Video',
@@ -130,6 +145,13 @@ function GeneratePageContent({ type }: { type: string }) {
   const hasEnoughCredits = user && (user.credits + user.dailyFreeCredits) >= cost;
 
   const handleGenerate = async () => {
+<<<<<<< HEAD
+=======
+    if (status !== "authenticated") {
+      setShowAuthModal(true);
+      return;
+    }
+>>>>>>> origin/main
     if (!prompt.trim() || isGenerating || !hasEnoughCredits) return;
     
     setIsGenerating(true);
@@ -137,19 +159,71 @@ function GeneratePageContent({ type }: { type: string }) {
     setLoadingProgress(0);
 
     const progressInterval = setInterval(() => {
+<<<<<<< HEAD
       setLoadingProgress(prev => (prev < 90 ? prev + (90 - prev) * 0.1 : prev));
     }, 500);
+=======
+      setLoadingProgress(prev => (prev < 90 ? prev + (90 - prev) * 0.05 : prev));
+    }, 1000);
+>>>>>>> origin/main
 
     try {
       const endpoint = type === 'text-to-image' ? '/api/generate/image' : (type === 'text-to-speech' ? '/api/generate/voice' : '/api/generate/video');
       const payload = type === 'text-to-speech' ? { text: prompt, voiceId: selectedVoice } : { prompt, type: type === 'image-to-video' ? 'image' : 'text', motion_value: motionValue, duration, resolution, aspect_ratio: aspectRatio, imageUrl: imagePreview };
+<<<<<<< HEAD
 
       const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const data = await res.json();
+=======
+
+      const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to start generation");
+      }
+
+      // Handle Asynchronous Polling (for Video)
+      if (data.requestId) {
+        let polling = true;
+        let attempts = 0;
+        const maxAttempts = 60; // 5 mins
+
+        while (polling && attempts < maxAttempts) {
+          attempts++;
+          await new Promise(r => setTimeout(r, 5000)); // Wait 5s between polls
+          
+          const statusRes = await fetch(`${endpoint}?requestId=${data.requestId}`);
+          const statusData = await statusRes.json();
+
+          if (statusData.status === "COMPLETED") {
+            polling = false;
+            setResultData({ success: true, data: { ...statusData, videoUrl: statusData.videoUrl, resultUrl: statusData.videoUrl, prompt, type } });
+            deductCredit(cost);
+            addHistoryItem({ videoUrl: statusData.videoUrl, resultUrl: statusData.videoUrl, cost, type, prompt, timestamp: new Date().toISOString() });
+          } else if (statusData.status === "FAILED") {
+            throw new Error(statusData.error || "Generation failed on the server.");
+          }
+          // Continue polling if IN_PROGRESS
+        }
+
+        if (attempts >= maxAttempts) {
+          throw new Error("Generation timed out. It might still be processing, please check History later.");
+        }
+      } else {
+        // Handle Synchronous Response (Image, Voice)
+        setResultData(data);
+        deductCredit(cost);
+        addHistoryItem({ ...data.data, cost, type, prompt, timestamp: new Date().toISOString() });
+      }
+>>>>>>> origin/main
       
       clearInterval(progressInterval);
       setLoadingProgress(100);
+      setTimeout(() => resultPanelRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
+      setIsGenerating(false);
 
+<<<<<<< HEAD
       setTimeout(() => {
         if (res.ok) {
           setResultData(data);
@@ -163,19 +237,138 @@ function GeneratePageContent({ type }: { type: string }) {
     } catch (err) {
       clearInterval(progressInterval);
       alert("Network Error: Could not reach backend.");
+=======
+    } catch (err: any) {
+      clearInterval(progressInterval);
+      alert("Generation Error: " + err.message);
+>>>>>>> origin/main
       setIsGenerating(false);
     }
   };
 
+<<<<<<< HEAD
   if (isLoading || !user) return <div className="flex items-center justify-center h-screen bg-[#070708] text-white font-bold tracking-widest animate-pulse">LOADING WORKSPACE...</div>;
+=======
+  if (isLoading) return <div className="flex items-center justify-center h-screen bg-[#070708] text-white font-bold tracking-widest animate-pulse">LOADING WORKSPACE...</div>;
+>>>>>>> origin/main
 
   return (
     <div className="flex flex-col h-[100dvh] bg-[#070708] text-white font-sans overflow-hidden">
       <Navbar />
       
+<<<<<<< HEAD
       <div className="flex flex-col-reverse lg:flex-row flex-1 pt-[72px] lg:overflow-hidden overflow-y-auto">
         {/* Sidebar / Settings */}
         <aside className="w-full lg:w-[350px] bg-[#0B0B0F]/80 backdrop-blur-2xl border-r border-white/5 flex flex-col p-6 overflow-y-auto no-scrollbar z-20">
+=======
+      <div className="flex flex-col lg:flex-row flex-1 pt-[70px] sm:pt-[80px] lg:overflow-hidden overflow-y-auto">
+        {/* Main Display Area - Moves to TOP on mobile */}
+        <main ref={resultPanelRef} className="w-full lg:flex-1 flex flex-col relative bg-[#070708] overflow-hidden min-h-[450px] lg:min-h-0">
+          {/* Header Stats - Desktop Only or simplified mobile */}
+          <header className="h-[60px] sm:h-[72px] border-b border-white/5 flex items-center justify-between px-4 sm:px-8 bg-[#070708]/80 backdrop-blur-md z-10 shrink-0">
+             <div className="flex items-center gap-2 sm:gap-4">
+                <button onClick={() => router.back()} className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all border border-white/5">
+                  <ChevronLeft size={18} />
+                </button>
+                <h2 className="text-base sm:text-xl font-black tracking-tight line-clamp-1">{title}</h2>
+             </div>
+             <div className="flex items-center gap-2 sm:gap-3">
+                <div className="hidden xs:flex px-3 py-1.5 sm:px-5 sm:py-2 rounded-full bg-white/5 border border-white/10 items-center gap-2 sm:gap-3">
+                  <span className="text-[9px] sm:text-[10px] font-black text-gray-500 uppercase">Credits</span>
+                  <span className="text-xs sm:text-sm font-bold text-white">{(user?.credits || 0) + (user?.dailyFreeCredits || 0)}</span>
+                </div>
+                <button onClick={() => router.push('/pricing')} className="px-3 py-1.5 sm:px-5 sm:py-2 rounded-full bg-white text-black font-black text-[10px] sm:text-xs hover:bg-[#3B82F6] hover:text-white transition-all">RECHARGE</button>
+             </div>
+          </header>
+
+          <div className="flex-1 relative flex items-center justify-center p-4 sm:p-6 md:p-12 overflow-hidden bg-gradient-to-b from-black/0 to-black/20">
+             {/* Background Decoration */}
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-[#3B82F6]/5 blur-[160px] rounded-full -z-10" />
+
+             {/* Generation Stage */}
+             <div className={`relative rounded-3xl sm:rounded-[40px] border border-white/5 bg-[#0B0B0F]/50 backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden transition-all duration-700 ease-out h-full max-h-[70vh] ${aspectRatio === '16:9' ? 'w-full max-w-[1100px] aspect-video' : aspectRatio === '9:16' ? 'aspect-[9/16]' : 'aspect-square'}`}>
+                
+                {!resultData && !isGenerating && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 sm:gap-6 p-6 sm:p-12 text-center">
+                    <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-[32px] bg-white/5 border border-white/10 flex items-center justify-center text-gray-700 animate-pulse">
+                      <Sparkles size={30} className="sm:size-[40px]" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-2xl font-black mb-1 sm:mb-2 uppercase">Ready to Create</h3>
+                      <p className="text-gray-500 text-xs sm:text-sm max-w-[300px] sm:max-w-[400px]">Adjust settings below and manifest your vision.</p>
+                    </div>
+                  </div>
+                )}
+
+                {isGenerating && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-[#0B0B0F]/90 backdrop-blur-md">
+                    <div className="w-[240px] sm:w-[300px] space-y-4 px-4">
+                       <div className="flex justify-between items-end mb-1">
+                          <span className="text-[9px] font-black text-white uppercase tracking-[0.2em] animate-pulse">Forging Metadata...</span>
+                          <span className="text-xs sm:text-sm font-bold text-white">{Math.round(loadingProgress)}%</span>
+                       </div>
+                       <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                          <div className="h-full bg-gradient-to-r from-white via-white/40 to-white shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-all duration-500" style={{ width: `${loadingProgress}%` }} />
+                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {resultData && (
+                  <div className="absolute inset-0 group">
+                    {type === 'text-to-image' ? (
+                       <img 
+                        src={resultData.data?.url || resultData.data?.resultUrl || resultData.url || resultData.resultUrl} 
+                        alt="Generated" 
+                        onLoad={() => setLoadingProgress(100)}
+                        className="w-full h-full object-contain" 
+                      />
+                    ) : type === 'text-to-speech' ? (
+                      <div className="w-full h-full flex flex-col items-center justify-center p-6 sm:p-12 bg-gradient-to-br from-[#0B0B14] to-[#010103]">
+                        <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-full border border-white/20 flex items-center justify-center mb-6 sm:mb-8 relative">
+                           <div className="absolute inset-0 rounded-full border border-white/40 animate-ping -z-10" />
+                           <div className="w-24 h-24 sm:w-40 sm:h-40 rounded-full bg-white flex items-center justify-center text-black">
+                              <Mic size={40} className="sm:size-[64px]" strokeWidth={3} />
+                           </div>
+                        </div>
+                        <h4 className="text-xl sm:text-2xl font-black mb-2 text-white">Synthesized Success</h4>
+                        <div className="w-full max-w-md bg-white/5 p-4 rounded-3xl border border-white/10 mt-4">
+                           <audio id="audio-player" src={resultData.data?.audioUrl || resultData.audioUrl} controls className="w-full accent-white" />
+                        </div>
+                      </div>
+                    ) : (
+                      <video 
+                        src={resultData.data?.videoUrl || resultData.data?.resultUrl || resultData.videoUrl || resultData.resultUrl} 
+                        controls 
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline 
+                        className="w-full h-full object-contain" 
+                      />
+                    )}
+
+                    {/* Action Palette */}
+                    <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-3 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 bg-black/60 backdrop-blur-2xl px-4 py-3 sm:px-6 sm:py-4 rounded-[24px] sm:rounded-[32px] border border-white/10 shadow-2xl">
+                      <button 
+                        onClick={()=>window.open(resultData.data?.url || resultData.data?.videoUrl || resultData.url || resultData.videoUrl || resultData.resultUrl)} 
+                        className="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-white text-black font-black text-[10px] sm:text-xs rounded-xl sm:rounded-2xl hover:bg-[#3B82F6] hover:text-white transition-all"
+                      >
+                        <Download size={14} /> DOWNLOAD
+                      </button>
+                      <button className="p-2 sm:p-3 bg-white/5 text-white rounded-xl sm:rounded-2xl border border-white/10 hover:bg-white/10 transition-all"><Share2 size={16} /></button>
+                      <div className="w-[1px] h-6 bg-white/10 mx-1 sm:mx-2" />
+                      <button className="hidden xs:flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 text-white/60 font-black text-[10px] sm:text-xs rounded-xl sm:rounded-2xl hover:text-white transition-all"><History size={14} /> HISTORY</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+          </div>
+        </main>
+
+        {/* Sidebar / Settings - Moves to BOTTOM on mobile */}
+        <aside className="w-full lg:w-[350px] bg-[#0B0B0F]/80 backdrop-blur-2xl border-t lg:border-t-0 lg:border-r border-white/5 flex flex-col p-6 overflow-y-auto no-scrollbar z-20 shrink-0">
+>>>>>>> origin/main
           <div className="flex items-center gap-2 mb-8">
             <Settings size={18} className="text-white" />
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500">Generation Parameters</h3>
@@ -313,7 +506,11 @@ function GeneratePageContent({ type }: { type: string }) {
              <div className="flex items-center gap-3">
                 <div className="px-5 py-2 rounded-full bg-white/5 border border-white/10 flex items-center gap-3">
                   <span className="text-[10px] font-black text-gray-500 uppercase">Available Credits</span>
+<<<<<<< HEAD
                   <span className="text-sm font-bold text-white">{user?.credits + user?.dailyFreeCredits}</span>
+=======
+                  <span className="text-sm font-bold text-white">{(user?.credits || 0) + (user?.dailyFreeCredits || 0)}</span>
+>>>>>>> origin/main
                 </div>
                 <button onClick={() => router.push('/pricing')} className="px-5 py-2 rounded-full bg-white text-black font-black text-xs hover:bg-[#3B82F6] hover:text-white transition-all">RECHARGE</button>
              </div>

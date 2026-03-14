@@ -1,7 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useSession, signOut } from "next-auth/react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export type StudentStatus = "none" | "pending" | "verified" | "rejected";
 
@@ -42,86 +42,132 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthOpen, setAuthOpen] = useState(false);
+  const [history, setHistory] = useState<any[]>([]);
 
-  // Sync with NextAuth session
-  useEffect(() => {
-    if (status === "authenticated" && session?.user) {
-      const stored = localStorage.getItem("vedagarbha_user");
-      let baseUser = stored ? JSON.parse(stored) : null;
-
-      // If session exists but no local user, or email mismatch, create/update
-      if (!baseUser || baseUser.email !== session.user.email) {
-        const today = new Date().toISOString().split('T')[0];
-        baseUser = {
-          id: (session.user as any).id || Date.now().toString(),
-          name: session.user.name || "User",
-          email: session.user.email,
-          credits: 10, // Initial credits for real signup
-          dailyFreeCredits: 3,
-          lastClaimDate: today,
-          studentStatus: "none",
-          history: []
-        };
+  // Fetch full user profile from DB when session is available
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      if (res.ok) {
+        const data = await res.json();
+        const storedHistory = localStorage.getItem("vedagarbha_history");
+        const currentHistory = storedHistory ? JSON.parse(storedHistory) : [];
+        setHistory(currentHistory);
+        setUser({
+          ...data.user,
+          history: currentHistory,
+        });
       }
-      setUser(baseUser);
-    } else if (status === "unauthenticated") {
-      setUser(null);
+    } catch (err) {
+      console.error("Failed to fetch user profile:", err);
     }
-    setIsLoading(status === "loading");
-  }, [session, status]);
+  }, []);
 
-  // Save to local storage on change
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("vedagarbha_user", JSON.stringify(user));
-    }
-  }, [user]);
+    const initAuth = async () => {
+      if (status === "loading") return;
 
+      if (session?.user) {
+        await fetchUserProfile();
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    };
+
+    initAuth();
+  }, [session, status, fetchUserProfile]);
+
+  // REAL login with email + password
   const login = async (email: string, pass: string) => {
-    // Handled by handleLogin in component via signIn('credentials')
+    const res = await signIn("credentials", {
+      email: email.toLowerCase(),
+      password: pass,
+      redirect: false,
+    });
+
+    if (res?.error) {
+      throw new Error(res.error);
+    }
+
+    // Wait for session to update, then fetch profile
+    await new Promise((r) => setTimeout(r, 500));
+    await fetchUserProfile();
   };
 
+  // Google login (placeholder — requires OAuth setup)
   const loginWithGoogle = async () => {
-    // Handled via signIn('google') in component
+    // Handled via signIn('google') in component if enabled
+    throw new Error("Google Sign-In requires OAuth configuration. Please use Email/Password for now.");
   };
 
+  // Apple login (placeholder)
   const loginWithApple = async () => {
-    // Handled via signIn('apple') in component
+    // Handled via signIn('apple') in component if enabled
+    throw new Error("Apple Sign-In requires Apple Developer account. Please use Email/Password for now.");
   };
 
+  // Phone login (placeholder)
   const loginWithPhone = async (phone: string) => {
-     // Handled via signIn('phone') in component
+    // Handled via signIn('phone') in component if enabled
+    throw new Error("Phone login requires SMS provider. Please use Email/Password for now.");
   };
 
+  // REAL signup
   const signup = async (name: string, email: string, pass: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    setUser({ id: `user_${Date.now()}`, name, email, credits: 10, dailyFreeCredits: 3, lastClaimDate: today, studentStatus: "none", history: [] });
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password: pass }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Signup failed");
+    }
+
+    // Auto-login after signup
+    await login(email, pass);
   };
 
+  // REAL logout
   const logout = () => {
-    signOut();
+    signOut({ redirect: false });
+    localStorage.removeItem("vedagarbha_history");
     localStorage.removeItem("vedagarbha_user");
     setUser(null);
+    setHistory([]);
   };
 
-  const applyForStudentAuth = (eduEmail: string) => {
-    if (user) {
-      setUser({ ...user, studentStatus: "pending" });
-    }
+  const applyForStudentAuth = async (eduEmail: string) => {
+    if (!user) return;
+    await fetch("/api/auth/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentStatus: "pending" }),
+    });
+    setUser({ ...user, studentStatus: "pending" });
   };
 
-  const adminApproveStudent = () => {
-    if (user) {
-      setUser({ ...user, studentStatus: "verified" });
-    }
+  const adminApproveStudent = async () => {
+    if (!user) return;
+    await fetch("/api/auth/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentStatus: "verified" }),
+    });
+    setUser({ ...user, studentStatus: "verified" });
   };
 
-  const updateCredits = (amount: number) => {
-    if (user) {
-      // Use toFixed to prevent 0.30000000000000004 floating point errors, then parse back
-      const newAmount = Math.max(0, parseFloat((user.credits + amount).toFixed(1)));
-      setUser({ ...user, credits: newAmount });
-    }
+  const updateCredits = async (amount: number) => {
+    if (!user) return;
+    const newCredits = Math.max(0, parseFloat((user.credits + amount).toFixed(1)));
+    await fetch("/api/auth/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credits: newCredits }),
+    });
+    setUser({ ...user, credits: newCredits });
   };
 
   const deductCredit = (cost: number = 1): boolean => {
@@ -129,36 +175,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const totalAvailable = user.credits + user.dailyFreeCredits;
     if (totalAvailable < cost) return false;
 
-    setUser(prev => {
-      if (!prev) return prev;
-      
-      let newDaily = prev.dailyFreeCredits;
-      let newStd = prev.credits;
-      
-      if (newDaily >= cost) {
-        newDaily -= cost;
-      } else {
-        const remaining = cost - newDaily;
-        newDaily = 0;
-        newStd = parseFloat((newStd - remaining).toFixed(1));
-      }
-      
-      return { ...prev, dailyFreeCredits: newDaily, credits: newStd };
+    let newDaily = user.dailyFreeCredits;
+    let newStd = user.credits;
+
+    if (newDaily >= cost) {
+      newDaily -= cost;
+    } else {
+      const remaining = cost - newDaily;
+      newDaily = 0;
+      newStd = parseFloat((newStd - remaining).toFixed(1));
+    }
+
+    // Update DB asynchronously
+    fetch("/api/auth/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credits: newStd, dailyFreeCredits: newDaily }),
     });
+
+    setUser({ ...user, dailyFreeCredits: newDaily, credits: newStd });
     return true;
   };
 
   const addHistoryItem = (item: any) => {
-    setUser(prev => {
-      if (!prev) return prev;
-      const newHistory = [item, ...(prev.history || [])].slice(0, 50); // Increased history limit
-      return { ...prev, history: newHistory };
-    });
+    const newHistory = [item, ...history].slice(0, 50);
+    setHistory(newHistory);
+    localStorage.setItem("vedagarbha_history", JSON.stringify(newHistory));
+    if (user) {
+      setUser({ ...user, history: newHistory });
+    }
   };
 
   return (
     <AuthContext.Provider value={{
-      user, status, isAuthOpen, setAuthOpen, isLoading, login, loginWithGoogle, loginWithApple, loginWithPhone, signup, logout, applyForStudentAuth, adminApproveStudent, updateCredits, deductCredit, addHistoryItem
+      user, 
+      isLoading, 
+      status, 
+      login, 
+      loginWithGoogle, 
+      loginWithApple, 
+      loginWithPhone, 
+      signup, 
+      logout, 
+      applyForStudentAuth, 
+      adminApproveStudent, 
+      updateCredits, 
+      deductCredit, 
+      addHistoryItem,
+      isAuthOpen, 
+      setAuthOpen
     }}>
       {children}
     </AuthContext.Provider>

@@ -9,8 +9,7 @@ import Script from 'next/script';
 import { Sparkles, Zap, Shield, Cpu, ArrowRight, Check, GraduationCap } from 'lucide-react';
 
 export default function PricingPage() {
-  const { user, updateCredits, addHistoryItem } = useAuth();
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const { user, updateCredits, addHistoryItem, setAuthOpen } = useAuth();
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [isStudent, setIsStudent] = useState(false);
   const [credits, setCredits] = useState(100);
@@ -34,7 +33,7 @@ export default function PricingPage() {
 
   const handleCheckout = async () => {
     if (!user) {
-      setIsAuthOpen(true);
+      setAuthOpen(true);
       return;
     }
 
@@ -125,7 +124,7 @@ export default function PricingPage() {
 
   const handleStudentToggle = () => {
     if (!user) {
-      setIsAuthOpen(true);
+      setAuthOpen(true);
       return;
     }
     if (user.studentStatus !== 'verified') {
@@ -261,7 +260,11 @@ export default function PricingPage() {
 
                    <button 
                      onClick={handleCheckout}
+<<<<<<< HEAD
                      className="glass-card bg-white text-black px-8 py-5 rounded-[22px] font-black text-lg uppercase tracking-[0.2em] shadow-[0_20px_50px_rgba(255,255,255,0.1)] hover:shadow-[0_25px_60px_rgba(255,255,255,0.2)] hover:-translate-y-2 transition-all group flex items-center justify-center gap-3 mt-4"
+=======
+                     className="bg-white text-black px-8 py-5 rounded-[22px] font-black text-lg uppercase tracking-[0.2em] shadow-[0_0_25px_rgba(255,255,255,0.8)] hover:shadow-[0_0_40px_rgba(255,255,255,1)] hover:-translate-y-2 transition-all group flex items-center justify-center gap-3 mt-4"
+>>>>>>> origin/main
                    >
                      Complete Order <ArrowRight className="group-hover:translate-x-2 transition-transform" />
                    </button>
@@ -279,7 +282,6 @@ export default function PricingPage() {
         </div>
       </main>
 
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
       <StudentVerificationModal isOpen={isStudentModalOpen} onClose={() => setIsStudentModalOpen(false)} />
     </div>
   );
