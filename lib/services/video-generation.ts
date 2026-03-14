@@ -11,7 +11,7 @@ function generateKlingToken(ak: string, sk: string) {
   const payload = {
     iss: ak,
     exp: Math.floor(Date.now() / 1000) + 1800, // 30 mins
-    nbf: Math.floor(Date.now() / 1000) - 5
+    nbf: Math.floor(Date.now() / 1000) - 60 // 1 min ago to handle clock drift
   };
   
   const base64UrlEncode = (obj: any) => 
@@ -36,17 +36,18 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
   const videoKey = (process.env.VIDEO_API_KEY || "").trim();
   
   if (!videoKey) {
-    throw new Error("VIDEO_API_KEY is completely missing in environment variables.");
+    console.error("CRITICAL: VIDEO_API_KEY is EMPTY in environment variables.");
+    throw new Error("VIDEO_API_KEY is missing. Please add it to Vercel Settings.");
   }
 
   let token = "";
   if (videoKey.includes(':')) {
     const [ak, sk] = videoKey.split(':');
-    console.log(`DEBUG: Using AK: ${ak.substring(0,4)}...${ak.substring(ak.length-4)}`);
+    // Log partially obfuscated keys for debugging
+    console.log(`DEBUG: Authenticating with Kling AK: ${ak.slice(0, 4)}...${ak.slice(-4)}`);
     token = generateKlingToken(ak, sk);
   } else {
-    // If user provided a direct token instead of AK:SK
-    console.log("DEBUG: Using direct token (No AK:SK split)");
+    console.log("DEBUG: Using direct token from VIDEO_API_KEY (No colon found)");
     token = videoKey;
   }
   
@@ -66,6 +67,7 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
     payload.image = imageUrl;
   }
   
+  console.log(`DEBUG: Sending request to ${endpoint}`);
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -80,12 +82,12 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
   if (!response.ok) {
     console.error("Kling AI API Error Response:", JSON.stringify(result));
     
-    // Check for "access key not found" specifically and give better advice
+    // Help user with Access Key issues
     if (result.code === 401 || result.message?.toLowerCase().includes("access key")) {
-       throw new Error("Kling AI Error: Access Key not found. Please ensure your key is exactly in format 'ACCESS_KEY:SECRET_KEY' or a valid direct token.");
+       throw new Error("Kling AI Auth Failed: Please ensure your API key is in 'ACCESS_KEY:SECRET_KEY' format in Vercel.");
     }
 
-    throw new Error(result.message || result.error?.message || "Kling AI failed to start generation.");
+    throw new Error(result.message || "Kling AI failed to start. Check your account balance/quota.");
   }
 
   return { requestId: result.data?.task_id || result.task_id };

@@ -8,7 +8,7 @@ import AuthModal from "@/components/auth/AuthModal";
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, status, logout } = useAuth();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -30,7 +30,7 @@ const Navbar = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 h-[80px] z-[1000] flex items-center transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 h-[70px] sm:h-[80px] z-[1000] flex items-center transition-all duration-500 ${
         scrolled
           ? "glass bg-[#020202]/60 border-b border-white/10"
           : "bg-transparent"
@@ -38,9 +38,9 @@ const Navbar = () => {
     >
       <div className="w-full max-w-[1440px] mx-auto px-4 md:px-12 flex justify-between items-center h-full">
         {/* Logo Section */}
-        <div className="flex items-center gap-8 shrink-0 z-[1001]">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-12 h-12 preserve-3d group-hover:rotate-y-12 transition-transform duration-500">
+        <div className="flex items-center gap-2 sm:gap-8 shrink-0 z-[1001]">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+            <div className="relative w-7 h-7 sm:w-12 sm:h-12 preserve-3d group-hover:rotate-y-12 transition-transform duration-500">
               <img
                 src="/logo.png"
                 alt="Vedagarbha Logo"
@@ -49,10 +49,10 @@ const Navbar = () => {
               <div className="absolute inset-0 bg-white blur-2xl opacity-10 -z-10 animate-pulse"></div>
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-black tracking-tighter text-white group-hover:text-white transition-colors leading-none">
+              <span className="text-base sm:text-2xl font-black tracking-tighter text-white group-hover:text-white transition-colors leading-none">
                 VEDAGARBHA
               </span>
-              <span className="text-[9px] font-bold text-white/40 tracking-[0.3em] uppercase mt-1">
+              <span className="hidden sm:block text-[9px] font-bold text-white/40 tracking-[0.3em] uppercase mt-1 text-nowrap">
                 AI ECOSYSTEM
               </span>
             </div>
@@ -125,9 +125,9 @@ const Navbar = () => {
         </nav>
 
         {/* Right Section */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-1.5 sm:gap-6">
           {user ? (
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 sm:gap-6">
                <div className="hidden sm:flex flex-col items-end">
                 <span className="text-xs font-bold text-white tracking-widest text-glow">
                   {user.credits + user.dailyFreeCredits} CREDITS
@@ -141,11 +141,11 @@ const Navbar = () => {
               </div>
 
               <div className="relative group/user">
-                 <button className="flex items-center gap-3 glass-card bg-white/5 border border-white/10 px-4 py-2 hover:bg-white/10 transition-all">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-white to-[#3B82F6] flex items-center justify-center text-[11px] text-black font-black uppercase shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+                 <button className="flex items-center gap-1.5 sm:gap-3 glass-card bg-white/5 border border-white/10 px-2 py-1 sm:px-4 sm:py-2 hover:bg-white/10 transition-all">
+                  <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-white to-[#3B82F6] flex items-center justify-center text-[9px] sm:text-[11px] text-black font-black uppercase shadow-[0_0_10px_rgba(255,255,255,0.4)]">
                     {user.name.charAt(0)}
                   </div>
-                  <svg className="w-3 h-3 text-white transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+                  <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 <div className="absolute top-full right-0 mt-4 w-56 glass bg-[#020202]/95 border border-white/10 rounded-3xl p-3 opacity-0 invisible translate-y-4 group-hover/user:opacity-100 group-hover/user:visible group-hover/user:translate-y-0 transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
                   <Link href="/dashboard" className="flex items-center gap-4 px-5 py-3.5 text-[#A1A1A6] hover:text-white hover:bg-white/5 rounded-2xl font-bold text-sm tracking-wide transition-all">📊 DASHBOARD</Link>
@@ -156,18 +156,18 @@ const Navbar = () => {
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1 sm:gap-4">
                <button 
                 onClick={() => setIsAuthOpen(true)} 
-                className="hidden sm:block text-xs font-black uppercase tracking-widest text-[#8E8E93] hover:text-white transition-all px-4 py-2"
+                className="hidden md:block text-xs font-black uppercase tracking-widest text-[#8E8E93] hover:text-white transition-all px-4 py-2"
               >
                 Log in
               </button>
                <button
                 onClick={() => setIsAuthOpen(true)}
-                className="glass-card bg-white text-black px-4 py-2 sm:px-8 sm:py-3.5 font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center gap-2"
+                className="glass-card bg-white text-black px-2 py-1.5 sm:px-8 sm:py-3.5 font-black text-[8px] sm:text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center gap-1 sm:gap-2"
               >
-                Sign Up Now
+                Sign Up
               </button>
             </div>
           )}

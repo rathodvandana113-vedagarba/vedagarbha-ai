@@ -47,7 +47,7 @@ export async function generateVoice(text: string, voiceId?: string) {
     } catch (e) {}
 
     if (response.status === 402) {
-      errorMessage = "Credits exceeded or Tier restricted. Please switch to a default voice or upgrade.";
+      errorMessage = "ElevenLabs: Payment Required or Quota Exceeded. You may have reached your free character limit.";
     }
 
     throw new Error(`${errorMessage} (Status: ${response.status})`);

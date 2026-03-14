@@ -48,7 +48,7 @@ function GeneratePageContent({ type }: { type: string }) {
   const [aspectRatio, setAspectRatio] = useState<"16:9" | "9:16" | "1:1">("16:9");
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[0].id);
+  const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[4].id); // Adam id is at index 4 now
   const [voiceFilter, setVoiceFilter] = useState<string>("All");
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
