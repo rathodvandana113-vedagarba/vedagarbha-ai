@@ -10,7 +10,7 @@
  */
 
 export async function generateImage(prompt: string, aspectRatio: string) {
-  const apiKey = process.env.REPLICATE_API_TOKEN || process.env.IMAGE_API_KEY || "REMOVED_SECRET";
+  const apiKey = process.env.REPLICATE_API_TOKEN || process.env.IMAGE_API_KEY;
 
   if (!apiKey) {
     console.warn("[REPLICATE_API_TOKEN] NOT FOUND - FALLBACK TO MOCK");
@@ -35,18 +35,18 @@ export async function generateImage(prompt: string, aspectRatio: string) {
   }
 
   // ==== REAL REPLICATE INTEGRATION ====
-  // Using FLUX.1 [schnell] for fast, high-quality images
-  const response = await fetch('https://api.replicate.com/v1/predictions', {
+  // Using model-based API (always uses latest version automatically)
+  const response = await fetch('https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions', {
     method: 'POST',
     headers: {
-      'Authorization': `Token ${apiKey}`,
-      'Content-Type': 'application/json'
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'wait'
     },
     body: JSON.stringify({
-      version: "31191060936e3ed983577322fb7d425b741088496464f69903b4cf713ece556e", // flux-schnell
       input: {
         prompt: prompt,
-        aspect_ratio: aspectRatio,
+        aspect_ratio: aspectRatio || "16:9",
         output_format: "webp",
         output_quality: 90
       }
@@ -54,8 +54,8 @@ export async function generateImage(prompt: string, aspectRatio: string) {
   });
 
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403 || response.status === 402) {
-      console.warn("Replicate API Key exhausted or unauthorized - FALLBACK TO MOCK");
+    if (response.status === 401 || response.status === 403 || response.status === 402 || response.status === 422) {
+      console.warn("Replicate API error - FALLBACK TO MOCK");
       const mockImages = [
         "https://images.unsplash.com/photo-1682685797886-e46916e8d907?w=1024&q=95",
         "https://images.unsplash.com/photo-1717501218636-a390f9ac5957?w=1024&q=95",
@@ -77,14 +77,14 @@ export async function generateImage(prompt: string, aspectRatio: string) {
 
   const prediction = await response.json();
   
-  // Replicate predictions are async. We'll poll for a simple demo context, 
-  // or return the first output if available (some models return immediately)
+  // With Prefer: wait header, the prediction may already be complete
+  // Otherwise poll for result
   let result = prediction;
   let attempts = 0;
   while ((result.status !== 'succeeded' && result.status !== 'failed') && attempts < 30) {
     await new Promise(r => setTimeout(r, 1000));
     const pollRes = await fetch(result.urls.get, {
-      headers: { 'Authorization': `Token ${apiKey}` }
+      headers: { 'Authorization': `Bearer ${apiKey}` }
     });
     result = await pollRes.json();
     attempts++;
