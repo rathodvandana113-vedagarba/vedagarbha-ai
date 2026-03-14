@@ -1,19 +1,19 @@
 /**
  * AI Image Generation Service 
  * ===========================
- * This module acts as the pluggable layer for Image APIs (e.g. Midjourney API, DALL-E, Stability).
+ * This module acts as the pluggable layer for Image APIs (Google Imagen 3 via Gemini AI).
  * 
  * INTEGRATION INSTRUCTIONS:
- * 1. Add IMAGE_API_KEY to your .env.local file.
- * 2. Replace the fetch URL with your chosen provider (e.g., OpenAI, Stability AI).
- * 3. Map the returned JSON payload to match the { url, prompt, ratio } structure cleanly.
+ * 1. Grab a free API key from https://aistudio.google.com/app/apikey
+ * 2. Add IMAGE_API_KEY to your Vercel Environment Variables.
+ * 3. Test the platform!
  */
 
 export async function generateImage(prompt: string, aspectRatio: string) {
-  const apiKey = process.env.REPLICATE_API_TOKEN || process.env.IMAGE_API_KEY;
+  const apiKey = process.env.IMAGE_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
 
   if (!apiKey) {
-    console.warn("[REPLICATE_API_TOKEN] NOT FOUND - FALLBACK TO MOCK");
+    console.warn("[IMAGE_API_KEY] NOT FOUND - FALLBACK TO MOCK");
     // Simulate API delay
     await new Promise(r => setTimeout(r, 2000));
     const mockImages = [
@@ -34,28 +34,27 @@ export async function generateImage(prompt: string, aspectRatio: string) {
     };
   }
 
-  // ==== REAL REPLICATE INTEGRATION ====
-  // Using FLUX.1 [schnell] for fast, high-quality images
-  const response = await fetch('https://api.replicate.com/v1/predictions', {
+  // ==== REAL GOOGLE IMAGEN 3 INTEGRATION ====
+  // Using Google's Imagen 3 model via Gemini AI Studio (Free Tier Supported)
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`, {
     method: 'POST',
     headers: {
-      'Authorization': `Token ${apiKey}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      version: "31191060936e3ed983577322fb7d425b741088496464f69903b4cf713ece556e", // flux-schnell
-      input: {
-        prompt: prompt,
-        aspect_ratio: aspectRatio,
-        output_format: "webp",
-        output_quality: 90
+      instances: [
+        { prompt: prompt }
+      ],
+      parameters: {
+        sampleCount: 1,
+        aspectRatio: aspectRatio || "16:9" // 1:1, 3:4, 4:3, 9:16, 16:9
       }
     })
   });
 
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403 || response.status === 402) {
-      console.warn("Replicate API Key exhausted or unauthorized - FALLBACK TO MOCK");
+    if (response.status === 401 || response.status === 403 || response.status === 402 || response.status === 400) {
+      console.warn("Google API Key exhausted, rejected, or missing - FALLBACK TO MOCK");
       const mockImages = [
         "https://images.unsplash.com/photo-1682685797886-e46916e8d907?w=1024&q=95",
         "https://images.unsplash.com/photo-1717501218636-a390f9ac5957?w=1024&q=95",
@@ -71,30 +70,19 @@ export async function generateImage(prompt: string, aspectRatio: string) {
       };
     }
     const errorText = await response.text();
-    console.error("Replicate Image API Error:", errorText);
+    console.error("Google Imagen API Error:", errorText);
     throw new Error(`Image generation failed: ${response.statusText}`);
   }
 
   const prediction = await response.json();
+  const b64 = prediction.predictions?.[0]?.bytesBase64Encoded;
   
-  // Replicate predictions are async. We'll poll for a simple demo context, 
-  // or return the first output if available (some models return immediately)
-  let result = prediction;
-  let attempts = 0;
-  while ((result.status !== 'succeeded' && result.status !== 'failed') && attempts < 30) {
-    await new Promise(r => setTimeout(r, 1000));
-    const pollRes = await fetch(result.urls.get, {
-      headers: { 'Authorization': `Token ${apiKey}` }
-    });
-    result = await pollRes.json();
-    attempts++;
+  if (!b64) {
+     throw new Error("No image data returned from Google API");
   }
 
-  if (result.status === 'failed') {
-    throw new Error(`Replicate failed: ${result.error}`);
-  }
-
-  const resultUrl = result.output?.[0] || result.output;
+  const resultUrl = `data:image/jpeg;base64,${b64}`;
+  
   return {
     success: true,
     data: {
