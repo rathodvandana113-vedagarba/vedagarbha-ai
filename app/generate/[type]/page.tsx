@@ -25,7 +25,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 function GeneratePageContent({ type }: { type: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, status, isLoading, deductCredit, addHistoryItem } = useAuth();
+  const { user, status, isLoading, deductCredit, addHistoryItem, setAuthOpen } = useAuth();
   
   const initialPrompt = searchParams.get('prompt') || "";
   const [prompt, setPrompt] = useState(initialPrompt);
@@ -57,14 +57,6 @@ function GeneratePageContent({ type }: { type: string }) {
     setPrompt(prompt.trim() + ", cinematic lighting, dark background, masterpiece, 8k resolution, highly detailed, photorealistic, cinematic composition, moody atmosphere");
   };
 
-  const [showAuthModal, setShowAuthModal] = useState(false);
-
-  // Remove automatic popup to fix persistent modal bug
-  useEffect(() => {
-    if (showAuthModal && user) {
-      setShowAuthModal(false);
-    }
-  }, [user, showAuthModal]);
 
   const toolTitles: Record<string, string> = {
     'text-to-video': 'Cinematic Video',
@@ -89,7 +81,7 @@ function GeneratePageContent({ type }: { type: string }) {
 
   const handleGenerate = async () => {
     if (status !== "authenticated") {
-      setShowAuthModal(true);
+      setAuthOpen(true);
       return;
     }
     if (!prompt.trim() || isGenerating || !hasEnoughCredits) return;
@@ -483,10 +475,7 @@ function GeneratePageContent({ type }: { type: string }) {
            </div>
          </main>
        </div>
-       <AuthModal isOpen={showAuthModal} onClose={() => {
-         setShowAuthModal(false);
-         if (!user) router.push('/');
-       }} />
+       {/* Auth Modal is handled globally in KlingNav, removed local instances */}
     </div>
   );
 }

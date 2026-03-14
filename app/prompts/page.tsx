@@ -98,14 +98,13 @@ export default function PromptLibraryPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [activePType, setActivePType] = useState<"all"|PromptType>("all");
-  const [showAuth, setShowAuth] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, setAuthOpen } = useAuth();
 
   const handleUsePrompt = (promptText: string, type: PromptType) => {
     if (!user) {
-      setShowAuth(true);
+      setAuthOpen(true);
       return;
     }
     const routeMap: Record<PromptType, string> = {
@@ -134,7 +133,6 @@ export default function PromptLibraryPage() {
   return (
     <div className="min-h-screen bg-[#070708] text-white font-sans overflow-x-hidden">
       <Navbar />
-      <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
 
       <main className="pt-[100px] pb-24 max-w-[1440px] mx-auto px-4 md:px-8">
         {/* Cinematic Header */}
