@@ -10,7 +10,7 @@
  */
 
 export async function generateVoice(text: string, voiceId?: string) {
-  const apiKey = process.env.ELEVENLABS_API_KEY || process.env.VOICE_API_KEY;
+  const apiKey = (process.env.ELEVENLABS_API_KEY || process.env.VOICE_API_KEY || "").trim();
 
   if (!apiKey) {
     throw new Error("ELEVENLABS_API_KEY (VOICE_API_KEY) not found. Please add your ElevenLabs API key to environment variables.");

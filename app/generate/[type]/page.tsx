@@ -102,15 +102,12 @@ function GeneratePageContent({ type }: { type: string }) {
 
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  // Remove automatic popup to fix persistent modal bug
   useEffect(() => {
-    // Add a small delay to avoid flicker during navigation
-    const timer = setTimeout(() => {
-      if (!isLoading && !user) {
-        setShowAuthModal(true);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [user, isLoading]);
+    if (showAuthModal && user) {
+      setShowAuthModal(false);
+    }
+  }, [user, showAuthModal]);
 
   const toolTitles: Record<string, string> = {
     'text-to-video': 'Cinematic Video',
@@ -134,6 +131,10 @@ function GeneratePageContent({ type }: { type: string }) {
   const hasEnoughCredits = user && (user.credits + user.dailyFreeCredits) >= cost;
 
   const handleGenerate = async () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
     if (!prompt.trim() || isGenerating || !hasEnoughCredits) return;
     
     setIsGenerating(true);

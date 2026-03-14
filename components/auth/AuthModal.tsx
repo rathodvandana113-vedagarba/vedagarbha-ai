@@ -14,12 +14,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const { login, signup } = useAuth();
+  const { user, login, signup } = useAuth();
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("error");
 
-  if (!isOpen) return null;
+  if (!isOpen || user) return null;
 
   const showToast = (msg: string, type: "success" | "error" = "error") => {
     setToast(msg);
