@@ -34,7 +34,7 @@ const SHOWCASE_IMAGES = [
 
 export default function HomePage() {
   const router = useRouter();
-  const { user, isAuthOpen, setAuthOpen } = useAuth();
+  const { user, status, isAuthOpen, setAuthOpen } = useAuth();
   const [demoIdx, setDemoIdx] = useState(0);
   const [showcaseIdx, setShowcaseIdx] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -43,10 +43,10 @@ export default function HomePage() {
     // Slower intervals for mobile performance
     const int = setInterval(() => {
       setDemoIdx((prev) => (prev + 1) % DEMOS.length);
-    }, 10000); // 10s instead of 6s
+    }, 10000);
     const showcaseInt = setInterval(() => {
       setShowcaseIdx((prev) => (prev + 1) % 6);
-    }, 8000); // 8s instead of 4s
+    }, 8000);
     return () => {
       clearInterval(int);
       clearInterval(showcaseInt);
@@ -54,7 +54,7 @@ export default function HomePage() {
   }, []);
 
   const handleStart = (path: string) => {
-    if (!user) setAuthOpen(true);
+    if (status !== "authenticated") setAuthOpen(true);
     else router.push(path);
   };
 
@@ -87,16 +87,16 @@ export default function HomePage() {
                 Vedagarbha AI combines cinematic video synthesis, ultra-realistic image generation, and emotional speech into one immersive crystalline ecosystem.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start">
                 <button 
                   onClick={() => handleStart("/generate/text-to-video")}
-                  className="bg-white text-black px-8 py-3.5 md:px-12 md:py-5 rounded-[20px] font-black text-sm md:text-lg uppercase tracking-widest shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:-translate-y-2 transition-all group flex items-center gap-3 w-full sm:w-auto justify-center ring-[3px] ring-white/40"
+                  className="bg-white text-black px-12 py-5 rounded-[20px] font-black text-lg uppercase tracking-widest shadow-[0_0_80px_rgba(255,255,255,0.5)] hover:shadow-[0_0_100px_rgba(255,255,255,0.7)] hover:-translate-y-2 active:scale-95 transition-all group flex items-center gap-3 ring-[6px] ring-white/40 justify-center w-full sm:w-auto"
                 >
                   Get Started <ArrowRight className="group-hover:translate-x-2 transition-transform" />
                 </button>
                 <button 
                   onClick={() => document.getElementById('showcase')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="glass bg-white/5 border border-white/10 px-8 py-3.5 md:px-10 md:py-5 rounded-[20px] font-black text-sm md:text-lg uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-md w-full sm:w-auto justify-center text-center"
+                  className="glass bg-white/5 border border-white/10 px-10 py-5 rounded-[20px] font-black text-lg uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-all backdrop-blur-md justify-center w-full sm:w-auto text-center"
                 >
                   Showcase
                 </button>
@@ -164,7 +164,7 @@ export default function HomePage() {
                 </div>
                 <button 
                   onClick={() => setAuthOpen(true)}
-                  className="glass bg-white/5 px-6 py-3 md:px-8 md:py-4 rounded-full border border-white/10 text-glow font-black uppercase tracking-widest text-[10px] md:text-sm hover:bg-white hover:text-black hover:border-white transition-all whitespace-nowrap"
+                  className="bg-white text-black px-8 py-4 rounded-full shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:shadow-[0_0_80px_rgba(255,255,255,0.6)] font-black uppercase tracking-[0.2em] text-xs sm:text-sm hover:-translate-y-1 transition-all whitespace-nowrap ring-4 ring-white/50"
                 >
                   Join the Beta ➔
                 </button>
@@ -187,7 +187,7 @@ export default function HomePage() {
                         item.isImg ? (
                            <img src={item.media} className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-all duration-[2000ms] group-hover:scale-125 ease-out" alt="Bg"/>
                         ) : (
-                           <video src={item.media} poster={SHOWCASE_IMAGES[i]} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-all duration-[2000ms] group-hover:scale-125 ease-out" />
+                           <video src={item.media} poster={SHOWCASE_IMAGES[i % 6]} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-all duration-[2000ms] group-hover:scale-125 ease-out" />
                         )
                      )}
                      
@@ -295,6 +295,11 @@ export default function HomePage() {
            </div>
         </footer>
       </main>
+
+      <AuthModal 
+        isOpen={isAuthOpen} 
+        onClose={() => setAuthOpen(false)} 
+      />
     </div>
   );
 }

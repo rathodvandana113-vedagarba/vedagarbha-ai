@@ -10,8 +10,54 @@ import { Sparkles, Video, Image as ImageIcon, Mic, ArrowRight, Download, Share2,
 // Voice options for Text-to-Speech (ElevenLabs voice IDs)
 // Verified free-tier voices for ElevenLabs
 const VOICE_OPTIONS = [
-  { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel", category: "Female", desc: "American, Narrator" },
-  { id: "pNInz6obpgDQGcFmaJgB", name: "Adam", category: "Male", desc: "American, Deep Narration" }
+  // Female - North America
+  { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel", category: "Female", desc: "Calm, natural American" },
+  { id: "EXAVITQu4vr4xnSDxMaL", name: "Bella", category: "Female", desc: "Soft, warm & friendly" },
+  { id: "MF3mGyEYCl7XYWbV9V6O", name: "Elli", category: "Female", desc: "Young, expressive American" },
+  { id: "AZnzlk1XvdvUeBnXmlld", name: "Domi", category: "Female", desc: "Confident & bold" },
+  { id: "ThT5KcBeYPX3keUQqHPh", name: "Lily", category: "Female", desc: "Bright narration" },
+  { id: "piTKgc9n4Y1f6S7S6S8S", name: "Samantha", category: "Female", desc: "Professional, corporate" },
+  { id: "Lcf7u3S7Y8S6F7S4G9S1", name: "Audrey", category: "Female", desc: "Mid-Atlantic, sophisticated" },
+  
+  // Male - North America
+  { id: "29vD33N1CtxCmqQRPOHJ", name: "Drew", category: "Male", desc: "Deep, authoritative" },
+  { id: "VR6AewLTigWG4xSOukaG", name: "Arnold", category: "Male", desc: "Strong, cinematic hero" },
+  { id: "ErXwobaYiN019PkySvjV", name: "Antoni", category: "Male", desc: "Warm, conversational" },
+  { id: "yoZ06aMxZJJ28mfd3POQ", name: "Sam", category: "Male", desc: "Smooth narrator" },
+  { id: "TxGEqnHWrfWFTfGW9XjX", name: "Josh", category: "Male", desc: "Energetic, young" },
+  { id: "ODq5zmih8GrVes37Dizd", name: "Patrick", category: "Male", desc: "Charismatic storyteller" },
+  { id: "N2lVS1wzXK9X2C3X4C5X", name: "Bill", category: "Male", desc: "Trustworthy, mature" },
+
+  { id: "pNInz6obpgDQGcFmaJgB", name: "Adam", category: "Male", desc: "American, Deep Narration" },
+
+  // British / European
+  { id: "jBpfAFnaylXS5xSbITun", name: "Freya", category: "Female", desc: "Elegant, refined British" },
+  { id: "jsCqWAovK2LkecY7zXl4", name: "Dorothy", category: "Female", desc: "Classic British lady" },
+  { id: "ZQe5CZNOzWyzPSCn5a3c", name: "James", category: "Male", desc: "Smooth British gentleman" },
+  { id: "Xp3nS4Y5T9X1R2C3X4X5", name: "Oliver", category: "Male", desc: "Youthful British" },
+  { id: "Hans_DE", name: "Hans", category: "International", desc: "Deep German accent" },
+  { id: "Pierre_FR", name: "Pierre", category: "International", desc: "Soft French accent" },
+  { id: "Lorenzo_IT", name: "Lorenzo", category: "International", desc: "Passionate Italian" },
+  { id: "Mateo_ES", name: "Mateo", category: "International", desc: "Clear Spanish voice" },
+
+  // Indian Accents
+  { id: "Aditi_IN", name: "Aditi", category: "International", desc: "Fluent, mild Indian Accent" },
+  { id: "Vikram_IN", name: "Vikram", category: "International", desc: "Professional Indian Male" },
+  { id: "Ananya_HI", name: "Ananya", category: "International", desc: "Hindi Accent Female" },
+  { id: "Arjun_HI", name: "Arjun", category: "International", desc: "Hindi Accent Male" },
+
+  // Characters
+  { id: "Thomas_Wise", name: "Thomas", category: "Character", desc: "Calm, wise elder" },
+  { id: "Harry_Animated", name: "Harry", category: "Character", desc: "Lively, animated" },
+  { id: "Gnome_Mystical", name: "Gnome", category: "Character", desc: "High pitched, mystical" },
+  { id: "Orc_Gritty", name: "Orc", category: "Character", desc: "Gritty, deep growl" },
+  { id: "Robo_Bot", name: "Robo-7", category: "Character", desc: "Flat, robotic monotone" },
+
+  // Specialty & News
+  { id: "Michael_News", name: "Michael", category: "Specialty", desc: "Newscast male" },
+  { id: "Jessica_News", name: "Jessica", category: "Specialty", desc: "Newscast female" },
+  { id: "Logan_Promo", name: "Logan", category: "Specialty", desc: "Exciting promo voice" },
+  { id: "Asher_ASMR", name: "Asher", category: "Specialty", desc: "Low-frequency ASMR" }
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -41,8 +87,10 @@ function GeneratePageContent({ type }: { type: string }) {
   const [aspectRatio, setAspectRatio] = useState<"16:9" | "9:16" | "1:1">("16:9");
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[1].id); // Adam default
+  const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[0].id); // Rachel default
   const [voiceFilter, setVoiceFilter] = useState<string>("All");
+
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,14 +105,11 @@ function GeneratePageContent({ type }: { type: string }) {
     setPrompt(prompt.trim() + ", cinematic lighting, dark background, masterpiece, 8k resolution, highly detailed, photorealistic, cinematic composition, moody atmosphere");
   };
 
-  const [showAuthModal, setShowAuthModal] = useState(false);
-
-  // Remove automatic popup to fix persistent modal bug
   useEffect(() => {
-    if (showAuthModal && user) {
-      setShowAuthModal(false);
+    if (!isLoading && !user && status === "unauthenticated") {
+      setShowAuthModal(true);
     }
-  }, [user, showAuthModal]);
+  }, [user, isLoading, status]);
 
   const toolTitles: Record<string, string> = {
     'text-to-video': 'Cinematic Video',
@@ -166,111 +211,7 @@ function GeneratePageContent({ type }: { type: string }) {
       <Navbar />
       
       <div className="flex flex-col lg:flex-row flex-1 pt-[70px] sm:pt-[80px] lg:overflow-hidden overflow-y-auto">
-        {/* Main Display Area - Moves to TOP on mobile */}
-        <main ref={resultPanelRef} className="w-full lg:flex-1 flex flex-col relative bg-[#070708] overflow-hidden min-h-[450px] lg:min-h-0">
-          {/* Header Stats - Desktop Only or simplified mobile */}
-          <header className="h-[60px] sm:h-[72px] border-b border-white/5 flex items-center justify-between px-4 sm:px-8 bg-[#070708]/80 backdrop-blur-md z-10 shrink-0">
-             <div className="flex items-center gap-2 sm:gap-4">
-                <button onClick={() => router.back()} className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all border border-white/5">
-                  <ChevronLeft size={18} />
-                </button>
-                <h2 className="text-base sm:text-xl font-black tracking-tight line-clamp-1">{title}</h2>
-             </div>
-             <div className="flex items-center gap-2 sm:gap-3">
-                <div className="hidden xs:flex px-3 py-1.5 sm:px-5 sm:py-2 rounded-full bg-white/5 border border-white/10 items-center gap-2 sm:gap-3">
-                  <span className="text-[9px] sm:text-[10px] font-black text-gray-500 uppercase">Credits</span>
-                  <span className="text-xs sm:text-sm font-bold text-white">{(user?.credits || 0) + (user?.dailyFreeCredits || 0)}</span>
-                </div>
-                <button onClick={() => router.push('/pricing')} className="px-3 py-1.5 sm:px-5 sm:py-2 rounded-full bg-white text-black font-black text-[10px] sm:text-xs hover:bg-[#3B82F6] hover:text-white transition-all">RECHARGE</button>
-             </div>
-          </header>
-
-          <div className="flex-1 relative flex items-center justify-center p-4 sm:p-6 md:p-12 overflow-hidden bg-gradient-to-b from-black/0 to-black/20">
-             {/* Background Decoration */}
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-[#3B82F6]/5 blur-[160px] rounded-full -z-10" />
-
-             {/* Generation Stage */}
-             <div className={`relative rounded-3xl sm:rounded-[40px] border border-white/5 bg-[#0B0B0F]/50 backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden transition-all duration-700 ease-out h-full max-h-[70vh] ${aspectRatio === '16:9' ? 'w-full max-w-[1100px] aspect-video' : aspectRatio === '9:16' ? 'aspect-[9/16]' : 'aspect-square'}`}>
-                
-                {!resultData && !isGenerating && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 sm:gap-6 p-6 sm:p-12 text-center">
-                    <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-[32px] bg-white/5 border border-white/10 flex items-center justify-center text-gray-700 animate-pulse">
-                      <Sparkles size={30} className="sm:size-[40px]" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg sm:text-2xl font-black mb-1 sm:mb-2 uppercase">Ready to Create</h3>
-                      <p className="text-gray-500 text-xs sm:text-sm max-w-[300px] sm:max-w-[400px]">Adjust settings below and manifest your vision.</p>
-                    </div>
-                  </div>
-                )}
-
-                {isGenerating && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-[#0B0B0F]/90 backdrop-blur-md">
-                    <div className="w-[240px] sm:w-[300px] space-y-4 px-4">
-                       <div className="flex justify-between items-end mb-1">
-                          <span className="text-[9px] font-black text-white uppercase tracking-[0.2em] animate-pulse">Forging Metadata...</span>
-                          <span className="text-xs sm:text-sm font-bold text-white">{Math.round(loadingProgress)}%</span>
-                       </div>
-                       <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                          <div className="h-full bg-gradient-to-r from-white via-white/40 to-white shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-all duration-500" style={{ width: `${loadingProgress}%` }} />
-                       </div>
-                    </div>
-                  </div>
-                )}
-
-                {resultData && (
-                  <div className="absolute inset-0 group">
-                    {type === 'text-to-image' ? (
-                       <img 
-                        src={resultData.data?.url || resultData.data?.resultUrl || resultData.url || resultData.resultUrl} 
-                        alt="Generated" 
-                        onLoad={() => setLoadingProgress(100)}
-                        className="w-full h-full object-contain" 
-                      />
-                    ) : type === 'text-to-speech' ? (
-                      <div className="w-full h-full flex flex-col items-center justify-center p-6 sm:p-12 bg-gradient-to-br from-[#0B0B14] to-[#010103]">
-                        <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-full border border-white/20 flex items-center justify-center mb-6 sm:mb-8 relative">
-                           <div className="absolute inset-0 rounded-full border border-white/40 animate-ping -z-10" />
-                           <div className="w-24 h-24 sm:w-40 sm:h-40 rounded-full bg-white flex items-center justify-center text-black">
-                              <Mic size={40} className="sm:size-[64px]" strokeWidth={3} />
-                           </div>
-                        </div>
-                        <h4 className="text-xl sm:text-2xl font-black mb-2 text-white">Synthesized Success</h4>
-                        <div className="w-full max-w-md bg-white/5 p-4 rounded-3xl border border-white/10 mt-4">
-                           <audio id="audio-player" src={resultData.data?.audioUrl || resultData.audioUrl} controls className="w-full accent-white" />
-                        </div>
-                      </div>
-                    ) : (
-                      <video 
-                        src={resultData.data?.videoUrl || resultData.data?.resultUrl || resultData.videoUrl || resultData.resultUrl} 
-                        controls 
-                        autoPlay 
-                        loop 
-                        muted 
-                        playsInline 
-                        className="w-full h-full object-contain" 
-                      />
-                    )}
-
-                    {/* Action Palette */}
-                    <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-3 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 bg-black/60 backdrop-blur-2xl px-4 py-3 sm:px-6 sm:py-4 rounded-[24px] sm:rounded-[32px] border border-white/10 shadow-2xl">
-                      <button 
-                        onClick={()=>window.open(resultData.data?.url || resultData.data?.videoUrl || resultData.url || resultData.videoUrl || resultData.resultUrl)} 
-                        className="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-white text-black font-black text-[10px] sm:text-xs rounded-xl sm:rounded-2xl hover:bg-[#3B82F6] hover:text-white transition-all"
-                      >
-                        <Download size={14} /> DOWNLOAD
-                      </button>
-                      <button className="p-2 sm:p-3 bg-white/5 text-white rounded-xl sm:rounded-2xl border border-white/10 hover:bg-white/10 transition-all"><Share2 size={16} /></button>
-                      <div className="w-[1px] h-6 bg-white/10 mx-1 sm:mx-2" />
-                      <button className="hidden xs:flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 text-white/60 font-black text-[10px] sm:text-xs rounded-xl sm:rounded-2xl hover:text-white transition-all"><History size={14} /> HISTORY</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-          </div>
-        </main>
-
-        {/* Sidebar / Settings - Moves to BOTTOM on mobile */}
+        {/* Sidebar / Settings */}
         <aside className="w-full lg:w-[350px] bg-[#0B0B0F]/80 backdrop-blur-2xl border-t lg:border-t-0 lg:border-r border-white/5 flex flex-col p-6 overflow-y-auto no-scrollbar z-20 shrink-0">
           <div className="flex items-center gap-2 mb-8">
             <Settings size={18} className="text-white" />
@@ -378,18 +319,18 @@ function GeneratePageContent({ type }: { type: string }) {
               <textarea 
                 value={prompt} 
                 onChange={(e)=>setPrompt(e.target.value)} 
-                className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-4 text-sm focus:outline-none focus:border-white/40 resize-none transition-all placeholder:text-gray-700"
+                className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-4 text-sm focus:outline-none focus:border-white/40 resize-none transition-all placeholder:text-gray-700 font-bold"
                 placeholder={`Envision your ${shortType} here...`}
               />
               <button 
                 onClick={handleGenerate}
-                disabled={isGenerating || !prompt.trim() || !hasEnoughCredits}
+                disabled={isGenerating || !prompt.trim() || (!hasEnoughCredits && status === "authenticated")}
                 className="w-full py-4 rounded-2xl bg-white text-black font-black text-sm relative overflow-hidden group hover:shadow-[0_10px_40px_rgba(255,255,255,0.1)] disabled:opacity-50 disabled:grayscale transition-all active:scale-[0.98]"
               >
                 <div className="absolute inset-x-0 bottom-0 top-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 skew-x-12" />
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   {isGenerating ? "FORGING CREATION..." : resultData ? "REGENERATE" : "INITIALIZE GENERATION"}
-                  {!isGenerating && <span className="bg-black/10 px-2 py-0.5 rounded-lg text-[10px]">{cost} Cr</span>}
+                  {!isGenerating && status === "authenticated" && <span className="bg-black/10 px-2 py-0.5 rounded-lg text-[10px]">{cost} Cr</span>}
                 </span>
               </button>
             </div>
@@ -397,52 +338,52 @@ function GeneratePageContent({ type }: { type: string }) {
         </aside>
 
         {/* Main Display Area */}
-        <main ref={resultPanelRef} className="flex-1 flex flex-col relative bg-[#070708] overflow-hidden">
+        <main ref={resultPanelRef} className="flex-1 flex flex-col relative bg-[#070708] overflow-hidden min-h-[450px] lg:min-h-0">
           {/* Header Stats */}
-          <header className="h-[72px] border-b border-white/5 flex items-center justify-between px-8 bg-[#070708]/80 backdrop-blur-md z-10 shrink-0">
-             <div className="flex items-center gap-4">
-                <button onClick={() => router.back()} className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all border border-white/5">
-                  <ChevronLeft size={20} />
+          <header className="h-[60px] sm:h-[72px] border-b border-white/5 flex items-center justify-between px-4 sm:px-8 bg-[#070708]/80 backdrop-blur-md z-10 shrink-0">
+             <div className="flex items-center gap-2 sm:gap-4">
+                <button onClick={() => router.back()} className="w-8 h-8 sm:w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-all border border-white/5">
+                  <ChevronLeft size={18} />
                 </button>
-                <h2 className="text-xl font-black tracking-tight">{title}</h2>
+                <h2 className="text-base sm:text-xl font-black tracking-tight line-clamp-1">{title}</h2>
              </div>
-             <div className="flex items-center gap-3">
-                <div className="px-5 py-2 rounded-full bg-white/5 border border-white/10 flex items-center gap-3">
-                  <span className="text-[10px] font-black text-gray-500 uppercase">Available Credits</span>
-                  <span className="text-sm font-bold text-white">{(user?.credits || 0) + (user?.dailyFreeCredits || 0)}</span>
+             <div className="flex items-center gap-2 sm:gap-3">
+                <div className="hidden xs:flex px-3 py-1.5 sm:px-5 sm:py-2 rounded-full bg-white/5 border border-white/10 items-center gap-2 sm:gap-3">
+                  <span className="text-[9px] sm:text-[10px] font-black text-gray-500 uppercase">Credits</span>
+                  <span className="text-xs sm:text-sm font-bold text-white">{(user?.credits || 0) + (user?.dailyFreeCredits || 0)}</span>
                 </div>
-                <button onClick={() => router.push('/pricing')} className="px-5 py-2 rounded-full bg-white text-black font-black text-xs hover:bg-[#3B82F6] hover:text-white transition-all">RECHARGE</button>
+                <button onClick={() => router.push('/pricing')} className="px-3 py-1.5 sm:px-5 sm:py-2 rounded-full bg-white text-black font-black text-[10px] sm:text-xs hover:bg-[#3B82F6] hover:text-white transition-all">RECHARGE</button>
              </div>
           </header>
 
-          <div className="flex-1 relative flex items-center justify-center p-6 md:p-12 overflow-hidden">
+          <div className="flex-1 relative flex items-center justify-center p-4 sm:p-6 md:p-12 overflow-hidden">
              {/* Background Decoration */}
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-[#3B82F6]/5 blur-[160px] rounded-full -z-10" />
 
              {/* Generation Stage */}
-             <div className={`relative rounded-[40px] border border-white/5 bg-[#0B0B0F]/50 backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden transition-all duration-700 ease-out ${aspectRatio === '16:9' ? 'w-full max-w-[1100px] aspect-video' : aspectRatio === '9:16' ? 'h-full max-h-[800px] aspect-[9/16]' : 'w-full max-w-[800px] aspect-square'}`}>
+             <div className={`relative rounded-3xl sm:rounded-[40px] border border-white/5 bg-[#0B0B0F]/50 backdrop-blur-3xl shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden transition-all duration-700 ease-out h-full max-h-[70vh] ${aspectRatio === '16:9' ? 'w-full max-w-[1100px] aspect-video' : aspectRatio === '9:16' ? 'aspect-[9/16]' : 'aspect-square'}`}>
                 
                 {!resultData && !isGenerating && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-12 text-center">
-                    <div className="w-24 h-24 rounded-[32px] bg-white/5 border border-white/10 flex items-center justify-center text-gray-700 animate-pulse">
-                      <Sparkles size={40} />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 sm:gap-6 p-6 sm:p-12 text-center">
+                    <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-[32px] bg-white/5 border border-white/10 flex items-center justify-center text-gray-700 animate-pulse">
+                      <Sparkles size={30} className="sm:size-[40px]" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-black mb-2">Awaiting Directive</h3>
-                      <p className="text-gray-500 max-w-[400px]">Configure your parameters and press generate to manifest your imagination into reality.</p>
+                      <h3 className="text-lg sm:text-2xl font-black mb-1 sm:mb-2 uppercase">Ready to Create</h3>
+                      <p className="text-gray-500 text-xs sm:text-sm max-w-[300px] sm:max-w-[400px]">Adjust settings below and manifest your vision.</p>
                     </div>
                   </div>
                 )}
 
                 {isGenerating && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-[#0B0B0F]/80 backdrop-blur-sm">
-                    <div className="w-[300px] space-y-4">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-[#0B0B0F]/90 backdrop-blur-md">
+                    <div className="w-[240px] sm:w-[300px] space-y-4 px-4">
                        <div className="flex justify-between items-end mb-1">
-                          <span className="text-[10px] font-black text-white uppercase tracking-[0.2em] animate-pulse">Analyzing Neural Pathways...</span>
-                          <span className="text-sm font-bold text-white">{Math.round(loadingProgress)}%</span>
+                          <span className="text-[9px] font-black text-white uppercase tracking-[0.2em] animate-pulse">Forging Metadata...</span>
+                          <span className="text-xs sm:text-sm font-bold text-white">{Math.round(loadingProgress)}%</span>
                        </div>
-                       <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
-                          <div className="h-full bg-gradient-to-r from-white via-white/40 to-white shadow-[0_0_15px_rgba(255,255,255,0.2)] transition-all duration-500" style={{ width: `${loadingProgress}%` }} />
+                       <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                          <div className="h-full bg-gradient-to-r from-white via-white/40 to-white shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-all duration-500" style={{ width: `${loadingProgress}%` }} />
                        </div>
                     </div>
                   </div>
@@ -451,42 +392,59 @@ function GeneratePageContent({ type }: { type: string }) {
                 {resultData && (
                   <div className="absolute inset-0 group">
                     {type === 'text-to-image' ? (
-                      <img src={resultData.data?.url || resultData.url} alt="Generated" className="w-full h-full object-contain" />
+                       <img 
+                        src={resultData.data?.url || resultData.data?.resultUrl || resultData.url || resultData.resultUrl} 
+                        alt="Generated" 
+                        onLoad={() => setLoadingProgress(100)}
+                        className="w-full h-full object-contain" 
+                      />
                     ) : type === 'text-to-speech' ? (
-                      <div className="w-full h-full flex flex-col items-center justify-center p-12 bg-gradient-to-br from-[#0B0B14] to-[#010103]">
-                        <div className="w-48 h-48 rounded-full border border-white/20 flex items-center justify-center mb-8 relative">
+                      <div className="w-full h-full flex flex-col items-center justify-center p-6 sm:p-12 bg-gradient-to-br from-[#0B0B14] to-[#010103]">
+                        <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-full border border-white/20 flex items-center justify-center mb-6 sm:mb-8 relative">
                            <div className="absolute inset-0 rounded-full border border-white/40 animate-ping -z-10" />
-                           <div className="w-40 h-40 rounded-full bg-white flex items-center justify-center text-black">
-                              <Mic size={64} strokeWidth={3} />
+                           <div className="w-24 h-24 sm:w-40 sm:h-40 rounded-full bg-white flex items-center justify-center text-black">
+                              <Mic size={40} className="sm:size-[64px]" strokeWidth={3} />
                            </div>
                         </div>
-                        <h4 className="text-2xl font-black mb-2 text-white">Synthesized Success</h4>
-                        <p className="text-gray-500 mb-8 italic">"{prompt.substring(0, 100)}..."</p>
-                        <div className="w-full max-w-md bg-white/5 p-4 rounded-3xl border border-white/10">
+                        <h4 className="text-xl sm:text-2xl font-black mb-2 text-white">Synthesized Success</h4>
+                        <div className="w-full max-w-md bg-white/5 p-4 rounded-3xl border border-white/10 mt-4">
                            <audio id="audio-player" src={resultData.data?.audioUrl || resultData.audioUrl} controls className="w-full accent-white" />
                         </div>
                       </div>
                     ) : (
-                      <video src={resultData.data?.videoUrl || resultData.videoUrl} controls autoPlay loop muted playsInline className="w-full h-full object-contain" />
+                      <video 
+                        src={resultData.data?.videoUrl || resultData.data?.resultUrl || resultData.videoUrl || resultData.resultUrl} 
+                        controls 
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline 
+                        className="w-full h-full object-contain" 
+                      />
                     )}
 
                     {/* Action Palette */}
-                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 bg-black/40 backdrop-blur-2xl px-6 py-4 rounded-[32px] border border-white/10 border-b-white/20">
-                      <button onClick={()=>window.open(resultData.data?.url || resultData.data?.videoUrl || resultData.url || resultData.videoUrl)} className="flex items-center gap-2 px-6 py-3 bg-white text-black font-black text-xs rounded-2xl hover:bg-[#3B82F6] hover:text-white transition-all"><Download size={14} /> DOWNLOAD RESULT</button>
-                      <button className="p-3 bg-white/5 text-white rounded-2xl border border-white/10 hover:bg-white/10 transition-all"><Share2 size={16} /></button>
-                      <div className="w-[1px] h-6 bg-white/10 mx-2" />
-                      <button className="flex items-center gap-2 px-6 py-3 text-white/60 font-black text-xs rounded-2xl hover:text-white transition-all"><History size={14} /> VIEW IN HISTORY</button>
+                    <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-3 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 bg-black/60 backdrop-blur-2xl px-4 py-3 sm:px-6 sm:py-4 rounded-[24px] sm:rounded-[32px] border border-white/10 shadow-2xl">
+                      <button 
+                        onClick={()=>window.open(resultData.data?.url || resultData.data?.videoUrl || resultData.url || resultData.videoUrl || resultData.resultUrl)} 
+                        className="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-white text-black font-black text-[10px] sm:text-xs rounded-xl sm:rounded-2xl hover:bg-[#3B82F6] hover:text-white transition-all shadow-lg"
+                      >
+                        <Download size={14} /> DOWNLOAD
+                      </button>
+                      <button className="p-2 sm:p-3 bg-white/5 text-white rounded-xl sm:rounded-2xl border border-white/10 hover:bg-white/10 transition-all"><Share2 size={16} /></button>
+                      <div className="w-[1px] h-6 bg-white/10 mx-1 sm:mx-2" />
+                      <button className="hidden xs:flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 text-white/60 font-black text-[10px] sm:text-xs rounded-xl sm:rounded-2xl hover:text-white transition-all"><History size={14} /> HISTORY</button>
                     </div>
                   </div>
                 )}
               </div>
-           </div>
-         </main>
-       </div>
-       <AuthModal isOpen={showAuthModal} onClose={() => {
-         setShowAuthModal(false);
-         if (!user) router.push('/');
-       }} />
+          </div>
+        </main>
+      </div>
+      <AuthModal isOpen={showAuthModal} onClose={() => {
+        setShowAuthModal(false);
+        if (!user) router.push('/');
+      }} />
     </div>
   );
 }

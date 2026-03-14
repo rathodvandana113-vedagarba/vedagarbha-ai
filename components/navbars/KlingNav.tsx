@@ -8,11 +8,16 @@ import AuthModal from "@/components/auth/AuthModal";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, status, logout, isAuthOpen, setAuthOpen } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const router = useRouter();
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   
   const navLinks = [
     { name: "Dashboard", path: "/dashboard" },
@@ -102,8 +107,7 @@ const Navbar = () => {
                   key={item.path}
                   onClick={() => {
                     if (status !== "authenticated") {
-                      // Trigger modal in parent if possible, or just push to home
-                      router.push('/');
+                      setAuthOpen(true);
                     } else {
                       router.push(item.path);
                     }
@@ -129,12 +133,12 @@ const Navbar = () => {
             <div className="flex items-center gap-2 sm:gap-6">
                <div className="hidden sm:flex flex-col items-end">
                 <span className="text-[10px] font-bold text-white tracking-widest text-glow">
-                  {user.credits + user.dailyFreeCredits} CREDITS
+                  {user.credits + (user.dailyFreeCredits || 0)} CREDITS
                 </span>
-                <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden mt-1 mt-1 border border-white/5">
+                <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden mt-1 border border-white/5">
                   <div
                     className="h-full bg-gradient-to-r from-white to-[#3B82F6] shadow-[0_0_5px_white]"
-                    style={{ width: `${Math.min(100, ((user.credits + user.dailyFreeCredits) / 100) * 100)}%` }}
+                    style={{ width: `${Math.min(100, (((user.credits + (user.dailyFreeCredits || 0))) / 100) * 100)}%` }}
                   ></div>
                 </div>
               </div>
@@ -142,7 +146,7 @@ const Navbar = () => {
               <div className="relative group/user">
                  <button className="flex items-center gap-1 sm:gap-3 glass-card bg-white/5 border border-white/10 px-1.5 py-1 sm:px-4 sm:py-2 hover:bg-white/10 transition-all">
                   <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-white to-[#3B82F6] flex items-center justify-center text-[8px] sm:text-[11px] text-black font-black uppercase shadow-[0_0_10px_rgba(255,255,255,0.4)]">
-                    {user.name.charAt(0)}
+                    {user.name?.charAt(0) || user.email?.charAt(0) || "U"}
                   </div>
                   <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
                 </button>
@@ -155,16 +159,16 @@ const Navbar = () => {
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-1 sm:gap-4">
+             <div className="flex items-center gap-2 sm:gap-4">
                <button 
                 onClick={() => setAuthOpen(true)} 
-                className="text-[7px] sm:text-xs font-black uppercase tracking-widest text-[#8E8E93] hover:text-white transition-all px-2 sm:px-4 py-2"
+                className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-black px-4 sm:px-8 py-2 sm:py-3.5 rounded-xl bg-white border-2 border-white shadow-[0_0_30px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-all ring-4 ring-white/30"
               >
                 Log In
               </button>
                <button
                 onClick={() => setAuthOpen(true)}
-                className="glass-card bg-white text-black px-1.5 py-1 sm:px-8 sm:py-3.5 font-black text-[7px] sm:text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center gap-1 sm:gap-2"
+                className="bg-white text-black px-4 py-2 sm:px-8 sm:py-3.5 font-black text-[10px] sm:text-xs uppercase tracking-[0.2em] shadow-[0_0_40px_rgba(255,255,255,0.5)] hover:shadow-[0_0_60px_rgba(255,255,255,0.7)] active:scale-95 transition-all flex items-center gap-1 sm:gap-2 rounded-xl border-2 border-white"
               >
                 Sign Up
               </button>
@@ -197,12 +201,12 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
        <div
-        className={`lg:hidden fixed inset-0 bg-[#020202]/98 backdrop-blur-3xl z-[999] transition-all duration-700 overflow-y-auto ${
+        className={`lg:hidden fixed inset-0 bg-[#020202]/98 backdrop-blur-3xl z-[999] transition-all duration-700 ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="fixed inset-0 grid-overlay opacity-30 pointer-events-none"></div>
-        <div className="flex flex-col min-h-full pt-32 px-10 pb-16 relative z-10 w-full">
+        <div className="flex flex-col min-h-full pt-32 px-10 pb-16 relative z-10 w-full overflow-y-auto">
             <nav className="flex flex-col gap-10">
               <div className="flex flex-col gap-6">
                 <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em] mb-2">NAVIGATION</span>
@@ -220,13 +224,38 @@ const Navbar = () => {
                 ))}
               </div>
 
+               <div className="flex flex-col gap-4 mt-8">
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em] mb-4">AI ECOSYSTEM</span>
+                <div className="grid grid-cols-1 gap-4">
+                  {aiFeatures.map((item) => (
+                    <button
+                      key={item.path}
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        if (status !== "authenticated") {
+                          setAuthOpen(true);
+                        } else {
+                          router.push(item.path);
+                        }
+                      }}
+                      className="flex items-center gap-6 p-6 glass bg-white/[0.02] border border-white/5 rounded-[32px] text-[#8E8E93] hover:text-white transition-all text-left group"
+                    >
+                      <span className="text-3xl group-hover:scale-110 transition-transform">
+                        {item.icon}
+                      </span>
+                      <span className="text-xl font-black uppercase tracking-tight">{item.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {user && (
                 <button
                   onClick={() => {
                     logout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="mt-8 py-6 px-10 rounded-[32px] glass bg-red-500/5 border border-red-500/20 text-red-500 font-black uppercase tracking-widest text-lg hover:bg-red-500/10 transition-all text-center"
+                  className="mt-12 py-6 px-10 rounded-[32px] glass bg-red-500/5 border border-red-500/20 text-red-500 font-black uppercase tracking-widest text-lg hover:bg-red-500/10 transition-all text-center"
                 >
                   Log out
                 </button>
@@ -235,7 +264,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Auth Modal */}
       <AuthModal 
         isOpen={isAuthOpen} 
         onClose={() => setAuthOpen(false)} 

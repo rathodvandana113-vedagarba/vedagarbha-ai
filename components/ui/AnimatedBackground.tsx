@@ -71,10 +71,11 @@ const AnimatedBackground = () => {
       const particleCount = isMobile ? 30 : 100;
       
       for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
+        const p = new Particle();
         if (isMobile) {
-          particles[i].size *= 1.5; // Larger but fewer for performance
+          p.size *= 1.5; // Larger but fewer for performance
         }
+        particles.push(p);
       }
     };
 
@@ -102,10 +103,10 @@ const AnimatedBackground = () => {
       {/* Grid Overlay */}
       <div className="grid-overlay opacity-30 md:opacity-40"></div>
       
-      {/* Noise Texture - Hidden on mobile if needed, but let's keep for now with low opacity */}
+      {/* Noise Texture */}
       <div className="noise-bg opacity-[0.08] md:opacity-[0.15]"></div>
 
-      {/* Floating Glowing Orbs - Reduced for Mobile */}
+      {/* Floating Glowing Orbs - Optimized for Mobile */}
       <div className="absolute top-[10%] left-[5%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-white rounded-full blur-[80px] md:blur-[160px] opacity-[0.03] md:opacity-[0.05] animate-float"></div>
       <div className="absolute bottom-[10%] right-[5%] w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[#3B82F6] rounded-full blur-[100px] md:blur-[180px] opacity-[0.03] md:opacity-[0.05] animate-float" style={{ animationDelay: '-3s' }}></div>
       <div className="hidden md:block absolute top-[40%] right-[20%] w-[300px] h-[300px] bg-white rounded-full blur-[120px] opacity-[0.03] animate-float" style={{ animationDelay: '-1.5s' }}></div>

@@ -7,13 +7,16 @@ import prisma from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    /* Temporarily disabled per user request
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
     }),
     AppleProvider({
       clientId: process.env.APPLE_ID || "",
       clientSecret: process.env.APPLE_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
       id: "phone",
@@ -47,7 +50,9 @@ export const authOptions: NextAuthOptions = {
         throw new Error("Invalid OTP");
       }
     }),
+    */
     CredentialsProvider({
+      id: "credentials",
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },

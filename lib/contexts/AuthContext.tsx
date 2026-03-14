@@ -18,8 +18,10 @@ export type User = {
 
 type AuthContextType = {
   user: User | null;
+  status: "authenticated" | "loading" | "unauthenticated";
+  isAuthOpen: boolean;
+  setAuthOpen: (open: boolean) => void;
   isLoading: boolean;
-  status: "loading" | "authenticated" | "unauthenticated";
   login: (email: string, pass: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   loginWithApple: () => Promise<void>;
@@ -31,8 +33,6 @@ type AuthContextType = {
   updateCredits: (amount: number) => void;
   deductCredit: (cost?: number) => boolean;
   addHistoryItem: (item: any) => void;
-  isAuthOpen: boolean;
-  setAuthOpen: (open: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthOpen, setAuthOpen] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
 
   // Fetch full user profile from DB when session is available
@@ -50,10 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.ok) {
         const data = await res.json();
         const storedHistory = localStorage.getItem("vedagarbha_history");
-        setHistory(storedHistory ? JSON.parse(storedHistory) : []);
+        const currentHistory = storedHistory ? JSON.parse(storedHistory) : [];
+        setHistory(currentHistory);
         setUser({
           ...data.user,
-          history: storedHistory ? JSON.parse(storedHistory) : [],
+          history: currentHistory,
         });
       }
     } catch (err) {
@@ -95,16 +97,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Google login (placeholder — requires OAuth setup)
   const loginWithGoogle = async () => {
+    // Handled via signIn('google') in component if enabled
     throw new Error("Google Sign-In requires OAuth configuration. Please use Email/Password for now.");
   };
 
   // Apple login (placeholder)
   const loginWithApple = async () => {
+    // Handled via signIn('apple') in component if enabled
     throw new Error("Apple Sign-In requires Apple Developer account. Please use Email/Password for now.");
   };
 
   // Phone login (placeholder)
   const loginWithPhone = async (phone: string) => {
+    // Handled via signIn('phone') in component if enabled
     throw new Error("Phone login requires SMS provider. Please use Email/Password for now.");
   };
 
@@ -129,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     signOut({ redirect: false });
     localStorage.removeItem("vedagarbha_history");
+    localStorage.removeItem("vedagarbha_user");
     setUser(null);
     setHistory([]);
   };
@@ -200,12 +206,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const [isAuthOpen, setAuthOpen] = useState(false);
-
   return (
     <AuthContext.Provider value={{
-      user, isLoading, status, login, loginWithGoogle, loginWithApple, loginWithPhone, signup, logout, applyForStudentAuth, adminApproveStudent, updateCredits, deductCredit, addHistoryItem,
-      isAuthOpen, setAuthOpen
+      user, 
+      isLoading, 
+      status, 
+      login, 
+      loginWithGoogle, 
+      loginWithApple, 
+      loginWithPhone, 
+      signup, 
+      logout, 
+      applyForStudentAuth, 
+      adminApproveStudent, 
+      updateCredits, 
+      deductCredit, 
+      addHistoryItem,
+      isAuthOpen, 
+      setAuthOpen
     }}>
       {children}
     </AuthContext.Provider>

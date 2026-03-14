@@ -1,9 +1,7 @@
-"use client";
-
 import React, { useState } from "react";
 import { useAuth } from "@/lib/contexts/AuthContext";
-import { X, Mail, Lock, User, Phone, Github } from "lucide-react";
 import { signIn } from "next-auth/react";
+import { X, Mail, Lock, User, Phone, Zap } from "lucide-react";
 
 type AuthModalProps = {
   isOpen: boolean;
@@ -19,7 +17,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   
-  const { user, status } = useAuth();
+  const { user, status, signup, setAuthOpen } = useAuth();
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"success" | "error">("error");
@@ -54,6 +52,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           setOtpSent(true);
           showToast("OTP Sent to " + phoneNumber, "success");
         } else {
+          if (otp !== "123456") throw new Error("Invalid OTP, use 123456");
           const result = await signIn("phone", {
             phone: phoneNumber,
             otp: otp,
@@ -73,18 +72,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         showToast("Welcome back! ✓", "success");
         setTimeout(() => onClose(), 500);
       } else {
-        // Signup logic is still in AuthContext
-        const { useAuth } = require("@/lib/contexts/AuthContext"); 
-        // Note: Using dynamic import or context here if needed, but let's keep it simple
-        const res = await fetch("/api/auth/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
-        
-        await signIn("credentials", { email, password, redirect: false });
+        await signup(name, email, password);
         showToast("Account created! 🎉", "success");
         setTimeout(() => onClose(), 500);
       }
@@ -96,43 +84,34 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
       {toast && (
-        <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-[1200] font-semibold px-6 py-3 rounded-full shadow-xl text-sm border ${toastType === "success" ? "bg-green-500 text-white border-green-400" : "bg-red-500 text-white border-red-400"}`}>
+        <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-[2100] bg-white text-black font-black px-8 py-4 rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)] text-xs border border-white/20 uppercase tracking-widest animate-in slide-in-from-top-4 ${toastType === 'error' ? 'border-red-500/50' : ''}`}>
           {toast}
         </div>
       )}
-      <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-[#020202]/95 backdrop-blur-2xl border border-white/20 rounded-[24px] shadow-[0_24px_100px_rgba(0,0,0,1)] custom-scrollbar">
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 text-gray-500 hover:text-white rounded-full hover:bg-white/5 transition-colors z-10">
+      <div className="relative w-full max-w-md bg-[#020202]/95 backdrop-blur-3xl border border-white/10 rounded-[32px] shadow-[0_40px_100px_rgba(0,0,0,0.8)] overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        <button onClick={onClose} className="absolute top-6 right-6 p-2 text-gray-500 hover:text-white rounded-full hover:bg-white/5 transition-all z-10">
           <X size={20} />
         </button>
 
-        {/* Logo + Title */}
-        <div className="flex flex-col items-center pt-8 pb-4 px-8">
-          <div className="w-16 h-16 mb-4">
-            <img src="/logo.png" alt="Vedagarbha Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]" />
+        <div className="flex flex-col items-center pt-10 pb-6 px-10">
+          <div className="w-20 h-20 mb-6 preserve-3d">
+            <img src="/logo.png" alt="Vedagarbha Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]" />
           </div>
-          <h2 className="text-2xl font-black text-white uppercase tracking-tighter text-center">
-            {tab === "login" ? "Welcome back" : tab === "signup" ? "Create account" : "Mobile Login"}
+          <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
+            {tab === "login" ? "Sign In" : tab === "signup" ? "Join Now" : "Phone Login"}
           </h2>
-          <p className="mt-1 text-[11px] font-bold text-gray-500 uppercase tracking-widest text-center">
-            {tab === "signup" ? "Get free credits on sign up" : "Access your AI ecosystem"}
+          <p className="mt-2 text-xs font-bold text-gray-500 uppercase tracking-widest text-center opacity-70">
+            {tab === "signup" ? "Claim 10 free credits" : "Access AI Ecosystem"}
           </p>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex mx-8 mb-4 bg-white/5 rounded-xl border border-white/10 p-1 gap-1">
-          {(["login", "signup", "phone"] as const).map(t => (
-            <button key={t} onClick={() => { setTab(t); setOtpSent(false); }}
-              className={`flex-1 py-3 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${tab === t ? "bg-white text-black shadow-lg" : "text-gray-500 hover:text-white"}`}>
-              {t === "login" ? "Log In" : t === "signup" ? "Sign Up" : "Phone"}
-            </button>
-          ))}
-        </div>
-
-        <div className="px-8 pb-8">
-          {/* Social Logins */}
+        <div className="px-10 pb-10">
+          {/* Social Logins - Temporarily hidden as requested, but logic remains */}
+          {/* To re-enable, simply uncomment this block */}
+          {/*
           <div className="grid grid-cols-2 gap-3 mb-6">
             <button onClick={() => handleSocialLogin('google')} className="flex items-center justify-center gap-3 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-4 h-4" alt="Google" />
@@ -143,68 +122,76 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <span className="text-[10px] font-bold uppercase tracking-widest">Apple</span>
             </button>
           </div>
+          */}
 
-          <div className="relative flex items-center gap-4 mb-6">
-            <div className="h-px bg-white/10 flex-1" />
-            <span className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em]">OR CONTINUE WITH</span>
-            <div className="h-px bg-white/10 flex-1" />
+          <div className="flex mx-0 mb-8 bg-white/5 rounded-2xl border border-white/10 p-1 gap-1">
+            {(["login", "signup", "phone"] as const).map(t => (
+              <button key={t} onClick={() => { setTab(t); setOtpSent(false); }}
+                className={`flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${tab === t ? "bg-white text-black shadow-lg shadow-white/10" : "text-gray-500 hover:text-white"}`}>
+                {t === "login" ? "Log In" : t === "signup" ? "Sign Up" : "Phone"}
+              </button>
+            ))}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {tab === "phone" ? (
               <>
-                <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-                  <input type="tel" placeholder="PHONE NUMBER (+91...)" required value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} disabled={otpSent}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white text-sm font-bold placeholder-gray-700 focus:outline-none focus:border-white/40 transition-all font-mono" />
+                 <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl flex items-center gap-3 mb-2">
+                  <Zap size={14} className="text-[#3B82F6]" />
+                  <span className="text-[10px] font-black text-[#3B82F6] uppercase tracking-widest">BETA SIMULATION MODE</span>
+                </div>
+                <div className="relative group">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" size={18} />
+                  <input type="tel" placeholder="+91 Phone Number" required value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} disabled={otpSent}
+                    className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all font-bold text-sm" />
                 </div>
                 {otpSent && (
-                  <div className="relative animate-in slide-in-from-top-2 duration-300">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-                    <input type="text" placeholder="ENTER OTP (123456)" required value={otp} onChange={e => setOtp(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white text-sm font-bold placeholder-gray-700 focus:outline-none focus:border-white/40 transition-all font-mono" />
+                  <div className="relative group animate-in slide-in-from-top-2 duration-300">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" size={18} />
+                    <input type="text" placeholder="123456" required value={otp} onChange={e => setOtp(e.target.value)}
+                      className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all font-bold text-sm text-center tracking-[0.5em]" />
                   </div>
                 )}
               </>
             ) : (
               <>
                 {tab === "signup" && (
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-                    <input type="text" placeholder="FULL NAME" required value={name} onChange={e => setName(e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white text-sm font-bold placeholder-gray-700 focus:outline-none focus:border-white/40 transition-all font-mono" />
+                  <div className="relative group">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" size={18} />
+                    <input type="text" placeholder="Full Name" required value={name} onChange={e => setName(e.target.value)}
+                      className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all font-bold text-sm" />
                   </div>
                 )}
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-                  <input type="email" placeholder="EMAIL ADDRESS" required value={email} onChange={e => setEmail(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white text-sm font-bold placeholder-gray-700 focus:outline-none focus:border-white/40 transition-all font-mono" />
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" size={18} />
+                  <input type="email" placeholder="Email Address" required value={email} onChange={e => setEmail(e.target.value)}
+                    className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all font-bold text-sm" />
                 </div>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-                  <input type="password" placeholder="PASSWORD" required value={password} onChange={e => setPassword(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-white text-sm font-bold placeholder-gray-700 focus:outline-none focus:border-white/40 transition-all font-mono" />
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" size={18} />
+                  <input type="password" placeholder="Password" required value={password} onChange={e => setPassword(e.target.value)}
+                    className="w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all font-bold text-sm" />
                 </div>
               </>
             )}
             
             <button type="submit" disabled={loading}
-              className="w-full py-4 mt-4 font-black text-white transition-all bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 hover:border-white/40 active:scale-95 disabled:opacity-50 tracking-[0.2em] uppercase text-[10px] shadow-[0_0_30px_rgba(255,255,255,0.05)]">
-              {loading ? "AUTHENTICATING..." : tab === "phone" ? (otpSent ? "VERIFY OTP" : "SEND OTP") : (tab === "login" ? "LOG IN TO PLATFORM" : "INITIALIZE ACCOUNT")}
+              className="w-full py-4 mt-4 font-black text-black bg-white rounded-2xl hover:bg-[#E2E2E2] active:scale-95 transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)] disabled:opacity-50 tracking-widest uppercase text-xs">
+              {loading ? "INITIALIZING..." : tab === "phone" ? (otpSent ? "VERIFY OTP" : "SEND SMS CODE") : (tab === "login" ? "SIGN IN" : "GENERATE ACCOUNT")}
             </button>
           </form>
 
-          <p className="mt-6 text-[10px] font-bold text-center text-gray-500 uppercase tracking-widest">
-            {tab === "login" ? "No account? " : tab === "signup" ? "Already registered? " : "Back to "}
+          <p className="mt-8 text-[10px] font-bold text-center text-gray-500 uppercase tracking-widest">
+            {tab === "login" ? "Don't have an account? " : tab === "signup" ? "Already joined? " : "Back to "}
             <button type="button" onClick={() => { setTab(tab === "login" ? "signup" : "login"); setOtpSent(false); }}
-              className="text-[#3B82F6] hover:text-white font-black transition-colors underline underline-offset-4 decoration-white/20">
-              {tab === "login" ? "Sign up free" : tab === "signup" ? "Log in now" : "Email Login"}
+              className="text-[#3B82F6] hover:text-white transition-colors hover:underline">
+              {tab === "login" ? "JOIN THE BETA" : tab === "signup" ? "SIGN IN HERE" : "EMAIL LOGIN"}
             </button>
           </p>
         </div>
           
-        <p className="mt-4 text-[10px] text-center text-gray-600">
-          Your data is securely stored and your password is encrypted
+        <p className="pb-6 text-[9px] text-center text-gray-600 uppercase tracking-tighter">
+          SECURE ENCRYPTED ACCESS • VEDAGARBHA AI
         </p>
       </div>
     </div>

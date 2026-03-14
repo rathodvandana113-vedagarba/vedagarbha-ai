@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Navbar from '@/components/navbars/KlingNav';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import AuthModal from '@/components/auth/AuthModal';
-import StudentVerificationModal from '../../components/auth/StudentVerificationModal';
+import StudentVerificationModal from '@/components/auth/StudentVerificationModal';
 import Script from 'next/script';
 import { Sparkles, Zap, Shield, Cpu, ArrowRight, Check, GraduationCap } from 'lucide-react';
 

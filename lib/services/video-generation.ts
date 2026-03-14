@@ -1,78 +1,44 @@
 import crypto from 'crypto';
 
 /**
- * AI Video Generation Service (Native Kling AI API)
- * ================================================
- * Suppors both AK:SK and direct Token formats.
+ * AI Video Generation Service (fal.ai Kling v1.6)
+ * ============================================
+ * Updated to use fal.ai based on the provided credentials in .env
  */
 
-function generateKlingToken(ak: string, sk: string) {
-  const header = { alg: "HS256", typ: "JWT" };
-  const payload = {
-    iss: ak,
-    exp: Math.floor(Date.now() / 1000) + 1800, // 30 mins
-    nbf: Math.floor(Date.now() / 1000) - 60 // 1 min ago to handle clock drift
-  };
-  
-  const base64UrlEncode = (obj: any) => 
-    Buffer.from(JSON.stringify(obj)).toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-  
-  const unsignedToken = `${base64UrlEncode(header)}.${base64UrlEncode(payload)}`;
-  const signature = crypto
-    .createHmac('sha256', sk)
-    .update(unsignedToken)
-    .digest('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
-  
-  return `${unsignedToken}.${signature}`;
-}
-
 export async function startVideoGeneration(prompt: string, type: 'text' | 'image', imageUrl?: string) {
-  const videoKey = (process.env.VIDEO_API_KEY || "").trim();
+  const videoKey = (process.env.VIDEO_API_KEY || process.env.FAL_KEY || "").trim();
   
   if (!videoKey) {
-    console.error("CRITICAL: VIDEO_API_KEY is EMPTY in environment variables.");
-    throw new Error("VIDEO_API_KEY is missing. Please add it to Vercel Settings.");
+    console.error("CRITICAL: VIDEO_API_KEY or FAL_KEY is EMPTY in environment variables.");
+    throw new Error("Video API key is missing. Please add VIDEO_API_KEY or FAL_KEY to Vercel Settings.");
   }
 
-  let token = "";
-  if (videoKey.includes(':')) {
-    const [ak, sk] = videoKey.split(':');
-    // Log partially obfuscated keys for debugging
-    console.log(`DEBUG: Authenticating with Kling AK: ${ak.slice(0, 4)}...${ak.slice(-4)}`);
-    token = generateKlingToken(ak, sk);
-  } else {
-    console.log("DEBUG: Using direct token from VIDEO_API_KEY (No colon found)");
-    token = videoKey;
-  }
+  // fal.ai key is used as 'Key KEY_ID:KEY_SECRET'
+  const authHeader = `Key ${videoKey}`;
   
-  const endpoint = type === 'image' 
-    ? "https://api.klingai.com/v1/videos/image2video"
-    : "https://api.klingai.com/v1/videos/text2video";
+  const model = type === 'image' 
+    ? "fal-ai/kling-video/v1.6/standard/image-to-video"
+    : "fal-ai/kling-video/v1.6/standard/text-to-video";
+
+  const endpoint = `https://queue.fal.run/${model}`;
 
   const payload: any = {
     prompt: prompt.trim(),
     aspect_ratio: "16:9",
-    model_name: "kling-v1-6",
-    duration: "5",
-    mode: "std"
+    duration: "5"
   };
 
   if (type === 'image' && imageUrl) {
-    payload.image = imageUrl;
+    payload.image_url = imageUrl;
   }
   
-  console.log(`DEBUG: Sending request to ${endpoint}`);
+  console.log(`DEBUG: Sending fal.ai request to ${endpoint}`);
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': authHeader
     },
     body: JSON.stringify(payload)
   });
@@ -80,56 +46,50 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
   const result = await response.json();
 
   if (!response.ok) {
-    console.error("Kling AI API Error Response:", JSON.stringify(result));
-    
-    // Help user with Access Key issues
-    if (result.code === 401 || result.message?.toLowerCase().includes("access key") || result.message?.toLowerCase().includes("auth")) {
-       throw new Error(`Kling AI Auth Failed (${result.code}): Please ensure your VIDEO_API_KEY is stored as 'ACCESS_KEY:SECRET_KEY' in Vercel. Current format: ${videoKey.includes(':') ? 'AK:SK (Correct)' : 'Direct Token (Likely Incorrect)'}`);
-    }
-
-    throw new Error(result.message || "Kling AI failed to start. Check your account balance/quota.");
+    console.error("fal.ai API Error Response:", JSON.stringify(result));
+    throw new Error(result.message || result.error || "fal.ai failed to start video generation.");
   }
 
-  return { requestId: result.data?.task_id || result.task_id };
+  // fal.ai queue returns a request_id or a logs url
+  const requestId = result.request_id;
+  if (!requestId) {
+    console.error("fal.ai did not return a request_id:", JSON.stringify(result));
+    throw new Error("fal.ai did not return a valid task ID.");
+  }
+
+  return { requestId };
 }
 
 export async function getVideoStatus(requestId: string) {
-  const videoKey = (process.env.VIDEO_API_KEY || "").trim();
+  const videoKey = (process.env.VIDEO_API_KEY || process.env.FAL_KEY || "").trim();
   if (!videoKey) throw new Error("API Key missing.");
   
-  let token = "";
-  if (videoKey.includes(':')) {
-    const [ak, sk] = videoKey.split(':');
-    token = generateKlingToken(ak, sk);
-  } else {
-    token = videoKey;
-  }
-  
-  const statusEndpoint = `https://api.klingai.com/v1/videos/text2video/${requestId}`;
+  const authHeader = `Key ${videoKey}`;
+  const statusEndpoint = `https://queue.fal.run/requests/${requestId}/status`;
   
   const response = await fetch(statusEndpoint, {
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers: { 'Authorization': authHeader }
   });
 
   if (!response.ok) {
-    try {
-      const err = await response.json();
-      throw new Error(err.message || "Failed to check generation status.");
-    } catch {
-      throw new Error(`Kling status check failed with status ${response.status}`);
-    }
+    const err = await response.json();
+    throw new Error(err.message || "Failed to check generation status.");
   }
 
-  const result = await response.json();
-  const data = result.data || result;
-
-  if (data.task_status === "succeed") {
-    const videoUrl = data.task_result?.videos?.[0]?.url || data.video_url;
+  const statusData = await response.json();
+  
+  if (statusData.status === "COMPLETED") {
+    // Once completed, we must fetch the result
+    const resultResponse = await fetch(`https://queue.fal.run/requests/${requestId}`, {
+      headers: { 'Authorization': authHeader }
+    });
+    const resultData = await resultResponse.json();
+    const videoUrl = resultData.video?.url || resultData.video_url;
     return { status: "COMPLETED", videoUrl };
   }
 
-  if (data.task_status === "failed") {
-    return { status: "FAILED", error: data.task_status_msg || "Kling AI provider-side failure" };
+  if (statusData.status === "FAILED") {
+    return { status: "FAILED", error: statusData.error || "fal.ai provider-side failure" };
   }
 
   return { status: "IN_PROGRESS" };
