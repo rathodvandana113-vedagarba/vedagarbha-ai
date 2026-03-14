@@ -31,6 +31,8 @@ type AuthContextType = {
   updateCredits: (amount: number) => void;
   deductCredit: (cost?: number) => boolean;
   addHistoryItem: (item: any) => void;
+  isAuthOpen: boolean;
+  setAuthOpen: (open: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -198,9 +200,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const [isAuthOpen, setAuthOpen] = useState(false);
+
   return (
     <AuthContext.Provider value={{
-      user, isLoading, status, login, loginWithGoogle, loginWithApple, loginWithPhone, signup, logout, applyForStudentAuth, adminApproveStudent, updateCredits, deductCredit, addHistoryItem
+      user, isLoading, status, login, loginWithGoogle, loginWithApple, loginWithPhone, signup, logout, applyForStudentAuth, adminApproveStudent, updateCredits, deductCredit, addHistoryItem,
+      isAuthOpen, setAuthOpen
     }}>
       {children}
     </AuthContext.Provider>

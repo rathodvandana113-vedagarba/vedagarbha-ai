@@ -34,8 +34,7 @@ const SHOWCASE_IMAGES = [
 
 export default function HomePage() {
   const router = useRouter();
-  const { user } = useAuth();
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const { user, isAuthOpen, setAuthOpen } = useAuth();
   const [demoIdx, setDemoIdx] = useState(0);
   const [showcaseIdx, setShowcaseIdx] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -55,7 +54,7 @@ export default function HomePage() {
   }, []);
 
   const handleStart = (path: string) => {
-    if (!user) setIsAuthOpen(true);
+    if (!user) setAuthOpen(true);
     else router.push(path);
   };
 
@@ -91,7 +90,7 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
                 <button 
                   onClick={() => handleStart("/generate/text-to-video")}
-                  className="glass-card bg-white text-black px-8 py-3.5 md:px-12 md:py-5 rounded-[20px] font-black text-sm md:text-lg uppercase tracking-widest shadow-[0_20px_50px_rgba(255,255,255,0.1)] hover:shadow-[0_25px_60px_rgba(255,255,255,0.2)] hover:-translate-y-2 transition-all group flex items-center gap-3 w-full sm:w-auto justify-center"
+                  className="bg-white text-black px-8 py-3.5 md:px-12 md:py-5 rounded-[20px] font-black text-sm md:text-lg uppercase tracking-widest shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:-translate-y-2 transition-all group flex items-center gap-3 w-full sm:w-auto justify-center ring-[3px] ring-white/40"
                 >
                   Get Started <ArrowRight className="group-hover:translate-x-2 transition-transform" />
                 </button>
@@ -296,8 +295,6 @@ export default function HomePage() {
            </div>
         </footer>
       </main>
-      
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
     </div>
   );
 }

@@ -8,8 +8,7 @@ import AuthModal from "@/components/auth/AuthModal";
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { user, status, logout } = useAuth();
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const { user, status, logout, isAuthOpen, setAuthOpen } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -158,13 +157,13 @@ const Navbar = () => {
           ) : (
             <div className="flex items-center gap-1 sm:gap-4">
                <button 
-                onClick={() => setIsAuthOpen(true)} 
+                onClick={() => setAuthOpen(true)} 
                 className="text-[7px] sm:text-xs font-black uppercase tracking-widest text-[#8E8E93] hover:text-white transition-all px-2 sm:px-4 py-2"
               >
                 Log In
               </button>
                <button
-                onClick={() => setIsAuthOpen(true)}
+                onClick={() => setAuthOpen(true)}
                 className="glass-card bg-white text-black px-1.5 py-1 sm:px-8 sm:py-3.5 font-black text-[7px] sm:text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center gap-1 sm:gap-2"
               >
                 Sign Up
@@ -239,7 +238,7 @@ const Navbar = () => {
       {/* Auth Modal */}
       <AuthModal 
         isOpen={isAuthOpen} 
-        onClose={() => setIsAuthOpen(false)} 
+        onClose={() => setAuthOpen(false)} 
       />
     </header>
   );
