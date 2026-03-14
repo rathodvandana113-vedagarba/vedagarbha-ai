@@ -10,16 +10,18 @@
  */
 
 export async function generateVideo(prompt: string, type: 'text' | 'image', imageUrl?: string) {
-  const apiKey = process.env.VIDEO_API_KEY;
+  const apiKey = process.env.FAL_KEY || process.env.VIDEO_API_KEY;
 
   if (!apiKey) {
-    console.warn("VIDEO_API_KEY is missing. Returning a mock success response.");
+    console.warn("[FAL_KEY] NOT FOUND - FALLBACK TO MOCK");
     // Simulate API delay
     await new Promise(r => setTimeout(r, 3000));
+    const resultUrl = "https://assets.mixkit.co/videos/preview/mixkit-ink-swirling-in-water-in-slow-motion-11911-large.mp4";
     return {
       success: true,
       data: {
-        videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-ink-swirling-in-water-in-slow-motion-11911-large.mp4", // Mock video playback
+        videoUrl: resultUrl, // Keep for backward compat
+        resultUrl,
         prompt,
         type
       }
@@ -63,10 +65,12 @@ export async function generateVideo(prompt: string, type: 'text' | 'image', imag
   }
 
   const result = await response.json();
+  const resultUrl = result.video?.url || result.data?.[0]?.url;
   return {
     success: true,
     data: {
-      videoUrl: result.video?.url || result.data?.[0]?.url, 
+      videoUrl: resultUrl, // Keep for backward compat
+      resultUrl,
       prompt, 
       type
     }

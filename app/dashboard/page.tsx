@@ -35,13 +35,12 @@ export default function DashboardPage() {
                 <span className="text-xl font-bold text-white bg-white/5 px-3 py-1 rounded-lg border border-white/10">{user.dailyFreeCredits}</span>
               </div>
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mt-4">
-                <span className="text-[#A1A1A6] font-medium text-sm">Standard Credits</span>
-                <span className="text-2xl font-extrabold text-[#D4AF37] drop-shadow-[0_0_10px_rgba(212,175,55,0.4)] bg-[#D4AF37]/10 px-3 py-1 rounded-lg border border-[#D4AF37]/20">{user.credits}</span>
+                <span className="text-2xl font-extrabold text-white bg-white/5 px-3 py-1 rounded-lg border border-white/20">{user.credits}</span>
               </div>
             </div>
             <Link 
               href="/pricing"
-              className="mt-2 text-sm bg-[#0B0B0F] border border-[#D4AF37] text-white px-5 py-2.5 rounded-lg font-semibold hover:-translate-y-0.5 transition-all shadow-[0_0_15px_rgba(212,175,55,0.2)] hover:shadow-[0_0_25px_rgba(245,217,122,0.4)] hover:border-[#F5D97A] block text-center w-full"
+              className="mt-2 text-sm bg-white text-black px-5 py-2.5 rounded-lg font-semibold hover:-translate-y-0.5 transition-all shadow-[0_10px_30px_rgba(255,255,255,0.1)] block text-center w-full"
             >
               Get More Credits
             </Link>
@@ -72,7 +71,7 @@ export default function DashboardPage() {
               </div>
             </div>
             {/* Soft background glow */}
-            <div className="absolute -right-20 -bottom-20 w-[300px] h-[300px] bg-gradient-to-br from-[#D4AF37] to-[#F5D97A] opacity-10 blur-[80px] pointer-events-none"></div>
+            <div className="absolute -right-20 -bottom-20 w-[300px] h-[300px] bg-gradient-to-br from-[#3B82F6] to-[#FFFFFF] opacity-10 blur-[80px] pointer-events-none"></div>
           </div>
         </div>
 
@@ -85,18 +84,20 @@ export default function DashboardPage() {
             {user.history && user.history.length > 0 ? (
               <div className="w-full text-left flex flex-col gap-4">
                 {user.history.map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 bg-[#0B0B0F]/50 border border-white/5 rounded-xl hover:border-[#D4AF37]/30 hover:bg-[#D4AF37]/5 transition-colors">
-                    <div className="flex flex-col gap-1">
+                  <div key={idx} className="flex items-center justify-between p-4 bg-[#0B0B0F]/50 border border-white/5 rounded-xl hover:border-white/20 transition-colors">
+                    <div className="flex flex-col gap-1 flex-1">
                       <span className="text-white font-semibold flex items-center gap-2">
-                         <span className="text-xs px-2 py-0.5 rounded bg-gradient-to-r from-[#D4AF37] to-[#F5D97A] text-[#0B0B0F] font-bold uppercase">{item.type}</span>
-                         {item.prompt || 'Audio Generation'}
+                         <span className="text-xs px-2 py-0.5 rounded bg-white text-black font-bold uppercase">{item.type}</span>
+                         <span className="truncate max-w-[300px]">{item.prompt || 'Audio Generation'}</span>
                       </span>
-                      <span className="text-xs text-[#A1A1A6]">Cost: {item.cost} credits</span>
+                      <span className="text-xs text-[#A1A1A6]">Cost: {item.cost} credits • {new Date(item.timestamp).toLocaleDateString()}</span>
                     </div>
-                    {item.videoUrl || item.url ? (
-                      <a href={item.videoUrl || item.url} target="_blank" className="text-xs bg-[#121218] px-4 py-2 rounded-md hover:border-[#D4AF37] text-white font-medium border border-white/10 transition-all">View Result</a>
-                    ) : item.audioUrl ? (
-                      <audio src={item.audioUrl} controls className="h-8 w-48" />
+                    {item.resultUrl ? (
+                      item.type === 'text-to-speech' ? (
+                        <audio src={item.resultUrl} controls className="h-8 w-48" />
+                      ) : (
+                        <a href={item.resultUrl} target="_blank" rel="noopener noreferrer" className="text-xs bg-[#121218] px-4 py-2 rounded-md hover:border-white text-white font-medium border border-white/10 transition-all">View Result</a>
+                      )
                     ) : null}
                   </div>
                 ))}
@@ -108,7 +109,7 @@ export default function DashboardPage() {
                 <p className="mb-6 max-w-sm">When you run text-to-video or text-to-image prompts, your creative history will appear here.</p>
                 <Link 
                   href="/generate/text-to-video"
-                  className="text-sm font-semibold px-6 py-2.5 rounded-lg border border-[#D4AF37] hover:bg-[#D4AF37]/10 hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] transition-all text-white"
+                  className="text-sm font-semibold px-6 py-2.5 rounded-lg border border-white/20 hover:bg-white/5 transition-all text-white"
                 >
                   Start Creating
                 </Link>

@@ -11,16 +11,16 @@ const config: Config = {
       colors: {
         bg: "#0B0B0F",
         panel: "#121218",
-        accent: "#D4AF37",
-        electric: "#F5D97A"
+        accent: "#E2E2E2",
+        electric: "#3B82F6"
       },
       boxShadow: {
-        glow: "0 0 40px rgba(212, 175, 55, 0.35)",
+        glow: "0 0 40px rgba(59, 130, 246, 0.2)",
         panel: "0 24px 60px rgba(0,0,0,0.65)"
       },
       backgroundImage: {
         "radial-grid":
-          "radial-gradient(circle at 15% 10%, rgba(212, 175, 55, 0.15), transparent 32%), radial-gradient(circle at 85% 12%, rgba(245, 217, 122, 0.1), transparent 34%)"
+          "radial-gradient(circle at 15% 10%, rgba(255, 255, 255, 0.05), transparent 32%), radial-gradient(circle at 85% 12%, rgba(59, 130, 246, 0.05), transparent 34%)"
       }
     }
   },

@@ -20,6 +20,8 @@ type AuthContextType = {
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
+  loginWithApple: () => Promise<void>;
+  loginWithPhone: (phone: string) => Promise<void>;
   signup: (name: string, email: string, pass: string) => Promise<void>;
   logout: () => void;
   applyForStudentAuth: (eduEmail: string) => void;
@@ -71,18 +73,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginWithGoogle = async () => {
     const today = new Date().toISOString().split('T')[0];
-    // Mock Google login using placeholder email
     const email = "googleuser@example.com";
     const name = email.split("@")[0];
-    const newUser: User = { id: "2", name, email, credits: 0, dailyFreeCredits: 3, lastClaimDate: today, studentStatus: "none", history: [] };
+    const newUser: User = { id: `google_${Date.now()}`, name, email, credits: 10, dailyFreeCredits: 3, lastClaimDate: today, studentStatus: "none", history: [] };
     setUser(newUser);
-    localStorage.setItem("vedagarbha_user", JSON.stringify(newUser));
+  };
+
+  const loginWithApple = async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const email = "appleuser@example.com";
+    const name = "Apple User";
+    const newUser: User = { id: `apple_${Date.now()}`, name, email, credits: 10, dailyFreeCredits: 3, lastClaimDate: today, studentStatus: "none", history: [] };
+    setUser(newUser);
+  };
+
+  const loginWithPhone = async (phone: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    const newUser: User = { id: `phone_${Date.now()}`, name: `User ${phone.slice(-4)}`, email: `${phone}@mobile.com`, credits: 10, dailyFreeCredits: 3, lastClaimDate: today, studentStatus: "none", history: [] };
+    setUser(newUser);
   };
 
   const signup = async (name: string, email: string, pass: string) => {
     const today = new Date().toISOString().split('T')[0];
-    // New users start with 0 standard credits
-    setUser({ id: "3", name, email, credits: 0, dailyFreeCredits: 3, lastClaimDate: today, studentStatus: "none", history: [] });
+    setUser({ id: `user_${Date.now()}`, name, email, credits: 10, dailyFreeCredits: 3, lastClaimDate: today, studentStatus: "none", history: [] });
   };
 
   const logout = () => {
@@ -112,36 +125,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const deductCredit = (cost: number = 1): boolean => {
     if (!user) return false;
-    
-    // Check if enough daily free credits
-    if (user.dailyFreeCredits >= cost) {
-      setUser({ ...user, dailyFreeCredits: user.dailyFreeCredits - cost });
-      return true;
-    }
-    
-    // Check if enough total credits (remaining cost)
-    const remainingCost = cost - user.dailyFreeCredits;
-    if (user.credits >= remainingCost) {
-      setUser({ 
-        ...user, 
-        dailyFreeCredits: 0, 
-        credits: parseFloat((user.credits - remainingCost).toFixed(1)) 
-      });
-      return true;
-    }
-    
-    return false; // Not enough credits
+    const totalAvailable = user.credits + user.dailyFreeCredits;
+    if (totalAvailable < cost) return false;
+
+    setUser(prev => {
+      if (!prev) return prev;
+      
+      let newDaily = prev.dailyFreeCredits;
+      let newStd = prev.credits;
+      
+      if (newDaily >= cost) {
+        newDaily -= cost;
+      } else {
+        const remaining = cost - newDaily;
+        newDaily = 0;
+        newStd = parseFloat((newStd - remaining).toFixed(1));
+      }
+      
+      return { ...prev, dailyFreeCredits: newDaily, credits: newStd };
+    });
+    return true;
   };
 
   const addHistoryItem = (item: any) => {
-    if (user) {
-      setUser({ ...user, history: [item, ...(user.history || [])].slice(0, 20) });
-    }
+    setUser(prev => {
+      if (!prev) return prev;
+      const newHistory = [item, ...(prev.history || [])].slice(0, 50); // Increased history limit
+      return { ...prev, history: newHistory };
+    });
   };
 
   return (
     <AuthContext.Provider value={{
-      user, isLoading, login, loginWithGoogle, signup, logout, applyForStudentAuth, adminApproveStudent, updateCredits, deductCredit, addHistoryItem
+      user, isLoading, login, loginWithGoogle, loginWithApple, loginWithPhone, signup, logout, applyForStudentAuth, adminApproveStudent, updateCredits, deductCredit, addHistoryItem
     }}>
       {children}
     </AuthContext.Provider>
