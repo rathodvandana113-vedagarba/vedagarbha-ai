@@ -16,7 +16,7 @@ const Navbar = () => {
   const router = useRouter();
   
   const navLinks = [
-    { name: "Home", path: "/" },
+    { name: "Dashboard", path: "/dashboard" },
     { name: "Pricing", path: "/pricing" },
     { name: "Prompt Library", path: "/prompts" },
   ];
@@ -207,7 +207,7 @@ const Navbar = () => {
             <nav className="flex flex-col gap-10">
               <div className="flex flex-col gap-6">
                 <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.5em] mb-2">NAVIGATION</span>
-                {[...navLinks, { name: "Dashboard", path: "/dashboard" }, { name: "AI Ecosystem", path: "#features" }].map((link) => (
+                {[...navLinks, { name: "AI Ecosystem", path: "#features" }].map((link) => (
                   <Link
                     key={link.name}
                     href={link.path}
