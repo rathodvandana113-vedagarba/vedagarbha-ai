@@ -165,7 +165,7 @@ const Navbar = () => {
               </button>
                <button
                 onClick={() => setIsAuthOpen(true)}
-                className="glass-card bg-white text-black px-8 py-3.5 font-black text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center gap-2"
+                className="glass-card bg-white text-black px-4 py-2 sm:px-8 sm:py-3.5 font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center gap-2"
               >
                 Sign Up Now
               </button>

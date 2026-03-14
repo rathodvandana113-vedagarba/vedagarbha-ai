@@ -3,7 +3,7 @@ import crypto from 'crypto';
 /**
  * AI Video Generation Service (Native Kling AI API)
  * ================================================
- * Using Kling AI's official Open Platform API.
+ * Suppors both AK:SK and direct Token formats.
  */
 
 function generateKlingToken(ak: string, sk: string) {
@@ -35,14 +35,20 @@ function generateKlingToken(ak: string, sk: string) {
 export async function startVideoGeneration(prompt: string, type: 'text' | 'image', imageUrl?: string) {
   const videoKey = (process.env.VIDEO_API_KEY || "").trim();
   
-  if (!videoKey || !videoKey.includes(':')) {
-    console.error("DEBUG: VIDEO_API_KEY is missing or invalid format.");
-    throw new Error("Invalid or missing VIDEO_API_KEY. Expected 'ACCESS_KEY:SECRET_KEY'");
+  if (!videoKey) {
+    throw new Error("VIDEO_API_KEY is completely missing in environment variables.");
   }
 
-  const [ak, sk] = videoKey.split(':');
-  console.log(`DEBUG: Using AK: ${ak.substring(0,4)}...${ak.substring(ak.length-4)}`);
-  const token = generateKlingToken(ak, sk);
+  let token = "";
+  if (videoKey.includes(':')) {
+    const [ak, sk] = videoKey.split(':');
+    console.log(`DEBUG: Using AK: ${ak.substring(0,4)}...${ak.substring(ak.length-4)}`);
+    token = generateKlingToken(ak, sk);
+  } else {
+    // If user provided a direct token instead of AK:SK
+    console.log("DEBUG: Using direct token (No AK:SK split)");
+    token = videoKey;
+  }
   
   const endpoint = type === 'image' 
     ? "https://api.klingai.com/v1/videos/image2video"
@@ -73,6 +79,12 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
 
   if (!response.ok) {
     console.error("Kling AI API Error Response:", JSON.stringify(result));
+    
+    // Check for "access key not found" specifically and give better advice
+    if (result.code === 401 || result.message?.toLowerCase().includes("access key")) {
+       throw new Error("Kling AI Error: Access Key not found. Please ensure your key is exactly in format 'ACCESS_KEY:SECRET_KEY' or a valid direct token.");
+    }
+
     throw new Error(result.message || result.error?.message || "Kling AI failed to start generation.");
   }
 
@@ -81,10 +93,15 @@ export async function startVideoGeneration(prompt: string, type: 'text' | 'image
 
 export async function getVideoStatus(requestId: string) {
   const videoKey = (process.env.VIDEO_API_KEY || "").trim();
-  if (!videoKey || !videoKey.includes(':')) throw new Error("API Key missing or invalid.");
+  if (!videoKey) throw new Error("API Key missing.");
   
-  const [ak, sk] = videoKey.split(':');
-  const token = generateKlingToken(ak, sk);
+  let token = "";
+  if (videoKey.includes(':')) {
+    const [ak, sk] = videoKey.split(':');
+    token = generateKlingToken(ak, sk);
+  } else {
+    token = videoKey;
+  }
   
   const statusEndpoint = `https://api.klingai.com/v1/videos/text2video/${requestId}`;
   

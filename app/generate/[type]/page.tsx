@@ -16,10 +16,9 @@ const VOICE_OPTIONS = [
   { id: "MF3mGyEYCl7XYWbV9V6O", name: "Elli", category: "Female", desc: "Young, clear American" },
   
   // Male
+  { id: "pNInz6obpgDQGcFmaJgB", name: "Adam", category: "Male", desc: "Deep narration, American" },
   { id: "ErXwobaYiN019PkySvjV", name: "Antoni", category: "Male", desc: "Well-rounded, American" },
-  { id: "TxGEqnHWrfWFTfGW9XjX", name: "Josh", category: "Male", desc: "Energetic, deep American" },
-  { id: "VR6AewLTigWG4xSOukaG", name: "Arnold", category: "Male", desc: "Strong, deep American" },
-  { id: "yoZ06aMxZJJ28mfd3POQ", name: "Sam", category: "Male", desc: "Narration, American" }
+  { id: "VR6AewLTigWG4xSOukaG", name: "Arnold", category: "Male", desc: "Strong, deep American" }
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
