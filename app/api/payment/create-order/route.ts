@@ -20,9 +20,10 @@ export async function POST(req: NextRequest) {
       stack: error.stack,
       code: error.code
     });
+    const trueError = error?.error?.description || error?.message || String(error);
     return NextResponse.json({ 
-      error: error.message || "Failed to create order",
-      details: error.description || error.message || "Internal Gateway Error"
+      error: "Failed to create order",
+      details: trueError
     }, { status: 500 });
   }
 }
