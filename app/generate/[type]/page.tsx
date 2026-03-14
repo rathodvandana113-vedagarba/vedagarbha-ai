@@ -141,8 +141,8 @@ function GeneratePageContent({ type }: { type: string }) {
     setLoadingProgress(0);
 
     const progressInterval = setInterval(() => {
-      setLoadingProgress(prev => (prev < 90 ? prev + (90 - prev) * 0.1 : prev));
-    }, 500);
+      setLoadingProgress(prev => (prev < 90 ? prev + (90 - prev) * 0.05 : prev));
+    }, 1000);
 
     try {
       const endpoint = type === 'text-to-image' ? '/api/generate/image' : (type === 'text-to-speech' ? '/api/generate/voice' : '/api/generate/video');
@@ -150,23 +150,53 @@ function GeneratePageContent({ type }: { type: string }) {
 
       const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to start generation");
+      }
+
+      // Handle Asynchronous Polling (for Video)
+      if (data.requestId) {
+        let polling = true;
+        let attempts = 0;
+        const maxAttempts = 60; // 5 mins
+
+        while (polling && attempts < maxAttempts) {
+          attempts++;
+          await new Promise(r => setTimeout(r, 5000)); // Wait 5s between polls
+          
+          const statusRes = await fetch(`${endpoint}?requestId=${data.requestId}`);
+          const statusData = await statusRes.json();
+
+          if (statusData.status === "COMPLETED") {
+            polling = false;
+            setResultData({ success: true, data: { ...statusData, videoUrl: statusData.videoUrl, resultUrl: statusData.videoUrl, prompt, type } });
+            deductCredit(cost);
+            addHistoryItem({ videoUrl: statusData.videoUrl, resultUrl: statusData.videoUrl, cost, type, prompt, timestamp: new Date().toISOString() });
+          } else if (statusData.status === "FAILED") {
+            throw new Error(statusData.error || "Generation failed on the server.");
+          }
+          // Continue polling if IN_PROGRESS
+        }
+
+        if (attempts >= maxAttempts) {
+          throw new Error("Generation timed out. It might still be processing, please check History later.");
+        }
+      } else {
+        // Handle Synchronous Response (Image, Voice)
+        setResultData(data);
+        deductCredit(cost);
+        addHistoryItem({ ...data.data, cost, type, prompt, timestamp: new Date().toISOString() });
+      }
       
       clearInterval(progressInterval);
       setLoadingProgress(100);
+      setTimeout(() => resultPanelRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
+      setIsGenerating(false);
 
-      setTimeout(() => {
-        if (res.ok) {
-          setResultData(data);
-          deductCredit(cost);
-          addHistoryItem({ ...data.data, cost, type, prompt, timestamp: new Date().toISOString() });
-          setTimeout(() => resultPanelRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
-        } else alert("Generation Error: " + data.error);
-        setIsGenerating(false);
-      }, 500);
-
-    } catch (err) {
+    } catch (err: any) {
       clearInterval(progressInterval);
-      alert("Network Error: Could not reach backend.");
+      alert("Generation Error: " + err.message);
       setIsGenerating(false);
     }
   };

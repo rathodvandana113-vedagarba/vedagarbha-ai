@@ -1,17 +1,17 @@
 /**
- * AI Video Generation Service 
- * ===========================
- * Using Fal.ai's Kling 1.6 video generation with Polling to prevent timeouts.
+ * AI Video Generation Service (Asynchronous)
+ * =========================================
+ * Using Fal.ai's Kling 1.6 video generation with a split submit/status pattern
+ * to prevent Vercel timeout issues.
  */
 
-export async function generateVideo(prompt: string, type: 'text' | 'image', imageUrl?: string) {
-  const apiKey = process.env.FAL_KEY || process.env.VIDEO_API_KEY;
+const API_KEY = process.env.FAL_KEY || process.env.VIDEO_API_KEY;
 
-  if (!apiKey) {
+export async function startVideoGeneration(prompt: string, type: 'text' | 'image', imageUrl?: string) {
+  if (!API_KEY) {
     throw new Error("VIDEO_API_KEY (FAL_KEY) not found. Please add your Fal.ai API key to environment variables.");
   }
 
-  // ==== REAL INTEGRATION START ====
   const endpoint = type === 'image' 
     ? "https://queue.fal.run/fal-ai/kling-video/v1.6/standard/image-to-video"
     : "https://queue.fal.run/fal-ai/kling-video/v1.6/standard/text-to-video";
@@ -25,65 +25,58 @@ export async function generateVideo(prompt: string, type: 'text' | 'image', imag
     payload.image_url = imageUrl;
   }
 
-  // 1. Submit to queue
-  const queueRes = await fetch(endpoint, {
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Key ${apiKey}`
+      'Authorization': `Key ${API_KEY}`
     },
     body: JSON.stringify(payload)
   });
 
-  if (!queueRes.ok) {
-    const errorText = await queueRes.text();
-    console.error("Fal.ai Queue Error:", errorText);
-    throw new Error("Failed to start video generation. Check your API key and balance.");
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Fal.ai Submission Error:", errorText);
+    throw new Error(`Failed to start generation: ${response.statusText}`);
   }
 
-  const { request_id } = await queueRes.json();
-  const statusEndpoint = `https://queue.fal.run/fal-ai/kling-video/v1.6/standard/requests/${request_id}`;
+  const { request_id } = await response.json();
+  return { requestId: request_id };
+}
 
-  // 2. Poll for result (Kling can take 2-5 minutes)
-  let attempts = 0;
-  const maxAttempts = 60; // 5 minutes (5s interval)
+export async function getVideoStatus(requestId: string) {
+  if (!API_KEY) {
+    throw new Error("API Key missing during status check.");
+  }
+
+  const statusEndpoint = `https://queue.fal.run/fal-ai/kling-video/v1.6/standard/requests/${requestId}`;
   
-  while (attempts < maxAttempts) {
-    attempts++;
-    console.log(`Polling for video (${request_id})... Attempt ${attempts}`);
-    
-    const statusRes = await fetch(statusEndpoint, {
-      headers: { 'Authorization': `Key ${apiKey}` }
-    });
-    
-    if (!statusRes.ok) {
-      throw new Error("Error checking video generation status.");
-    }
-    
-    const status = await statusRes.json();
-    
-    if (status.status === "COMPLETED") {
-      const resultUrl = status.video?.url || status.data?.[0]?.url || status.url;
-      if (!resultUrl) throw new Error("Video generation completed but no URL was found.");
-      
-      return {
-        success: true,
-        data: {
-          videoUrl: resultUrl,
-          resultUrl,
-          prompt,
-          type
-        }
-      };
-    }
-    
-    if (status.status === "FAILED") {
-      throw new Error("Video generation failed at the provider level.");
-    }
-    
-    // Wait 5 seconds before next poll
-    await new Promise(r => setTimeout(r, 5000));
+  const response = await fetch(statusEndpoint, {
+    headers: { 'Authorization': `Key ${API_KEY}` }
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to check generation status.");
   }
 
-  throw new Error("Video generation timed out. Please try again later.");
+  const status = await response.json();
+
+  if (status.status === "COMPLETED") {
+    const resultUrl = status.video?.url || status.data?.[0]?.url || status.url;
+    return { status: "COMPLETED", videoUrl: resultUrl };
+  }
+
+  if (status.status === "FAILED") {
+    return { status: "FAILED", error: status.error || "Provider-side failure" };
+  }
+
+  return { status: "IN_PROGRESS" };
+}
+
+// Keep for backward compatibility if needed, but we should move away from this
+export async function generateVideo(prompt: string, type: 'text' | 'image', imageUrl?: string) {
+    const { requestId } = await startVideoGeneration(prompt, type, imageUrl);
+    // This will still probably timeout on Vercel if called here, 
+    // but we'll use the requestId approach in the route handlers instead.
+    return { success: true, requestId };
 }
