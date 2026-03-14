@@ -9,8 +9,7 @@ import Script from 'next/script';
 import { Sparkles, Zap, Shield, Cpu, ArrowRight, Check, GraduationCap } from 'lucide-react';
 
 export default function PricingPage() {
-  const { user, updateCredits, addHistoryItem } = useAuth();
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const { user, updateCredits, addHistoryItem, setAuthOpen } = useAuth();
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [isStudent, setIsStudent] = useState(false);
   const [credits, setCredits] = useState(100);
@@ -34,7 +33,7 @@ export default function PricingPage() {
 
   const handleCheckout = async () => {
     if (!user) {
-      setIsAuthOpen(true);
+      setAuthOpen(true);
       return;
     }
 
@@ -125,7 +124,7 @@ export default function PricingPage() {
 
   const handleStudentToggle = () => {
     if (!user) {
-      setIsAuthOpen(true);
+      setAuthOpen(true);
       return;
     }
     if (user.studentStatus !== 'verified') {
@@ -279,7 +278,6 @@ export default function PricingPage() {
         </div>
       </main>
 
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
       <StudentVerificationModal isOpen={isStudentModalOpen} onClose={() => setIsStudentModalOpen(false)} />
     </div>
   );

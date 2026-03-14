@@ -163,7 +163,7 @@ export default function HomePage() {
                    <p className="text-[#A1A1A6] text-lg font-medium max-w-xl">Deep integration of generative models creating a fluid workflow for modern studios.</p>
                 </div>
                 <button 
-                  onClick={() => setIsAuthOpen(true)}
+                  onClick={() => setAuthOpen(true)}
                   className="glass bg-white/5 px-6 py-3 md:px-8 md:py-4 rounded-full border border-white/10 text-glow font-black uppercase tracking-widest text-[10px] md:text-sm hover:bg-white hover:text-black hover:border-white transition-all whitespace-nowrap"
                 >
                   Join the Beta ➔
