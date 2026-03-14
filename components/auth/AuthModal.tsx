@@ -94,7 +94,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           {(["login", "signup"] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`flex-1 py-2 rounded-lg text-sm font-semibold capitalize transition-all ${tab === t ? "bg-white text-black shadow-lg" : "text-[#8E8E93] hover:text-white"}`}>
-              {t.charAt(0).toUpperCase() + t.slice(1)}
+              {t === "login" ? "Log In" : "Sign Up"}
             </button>
           ))}
         </div>
@@ -121,7 +121,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </div>
             <button type="submit" disabled={loading}
               className="w-full py-3 mt-2 font-bold text-white transition-all bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 hover:-translate-y-0.5 shadow-[0_0_15px_rgba(255,255,255,0.05)] disabled:opacity-50 tracking-widest uppercase text-xs">
-              {loading ? "Please wait..." : (tab === "login" ? "Sign In" : "Create Account")}
+              {loading ? "Please wait..." : (tab === "login" ? "Log In" : "Create Account")}
             </button>
           </form>
 

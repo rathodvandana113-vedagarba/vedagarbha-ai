@@ -159,9 +159,9 @@ const Navbar = () => {
             <div className="flex items-center gap-1 sm:gap-4">
                <button 
                 onClick={() => setIsAuthOpen(true)} 
-                className="hidden md:block text-xs font-black uppercase tracking-widest text-[#8E8E93] hover:text-white transition-all px-4 py-2"
+                className="text-[7px] sm:text-xs font-black uppercase tracking-widest text-[#8E8E93] hover:text-white transition-all px-2 sm:px-4 py-2"
               >
-                Log in
+                Log In
               </button>
                <button
                 onClick={() => setIsAuthOpen(true)}
