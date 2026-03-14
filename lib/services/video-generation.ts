@@ -13,26 +13,10 @@ export async function generateVideo(prompt: string, type: 'text' | 'image', imag
   const apiKey = process.env.FAL_KEY || process.env.VIDEO_API_KEY;
 
   if (!apiKey) {
-    console.warn("[FAL_KEY] NOT FOUND - FALLBACK TO MOCK");
-    // Simulate API delay
-    await new Promise(r => setTimeout(r, 3000));
-    const resultUrl = "https://assets.mixkit.co/videos/preview/mixkit-ink-swirling-in-water-in-slow-motion-11911-large.mp4";
-    return {
-      success: true,
-      data: {
-        videoUrl: resultUrl, // Keep for backward compat
-        resultUrl,
-        prompt,
-        type
-      }
-    };
+    throw new Error("VIDEO_API_KEY (FAL_KEY) not found. Please add your Fal.ai API key to environment variables.");
   }
 
   // ==== REAL INTEGRATION START ====
-  // Using Fal.ai's Kling 1.6 video generation endpoint as it aligns with the "Kling Clone" project theme
-  // Text-to-Video: "fal-ai/kling-video/v1.6/standard/text-to-video"
-  // Image-to-Video: "fal-ai/kling-video/v1.6/standard/image-to-video"
-  
   const endpoint = type === 'image' 
     ? "https://queue.fal.run/fal-ai/kling-video/v1.6/standard/image-to-video"
     : "https://queue.fal.run/fal-ai/kling-video/v1.6/standard/text-to-video";
@@ -40,15 +24,13 @@ export async function generateVideo(prompt: string, type: 'text' | 'image', imag
   const payload: any = {
     prompt: prompt,
     aspect_ratio: "16:9",
-    duration: "5", // Default
   };
 
   if (type === 'image' && imageUrl) {
     payload.image_url = imageUrl;
   }
 
-  // We await the queue result synchronously for this simple demo layer
-  // In production, you would use webhooks or polling
+  // We await the result via Fal's queue system
   const response = await fetch(endpoint.replace('queue.', ''), {
     method: 'POST',
     headers: {
@@ -59,22 +41,16 @@ export async function generateVideo(prompt: string, type: 'text' | 'image', imag
   });
 
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403 || response.status === 402) {
-      console.warn("Fal.ai Video API Key exhausted or unauthorized - FALLBACK TO MOCK");
-      const resultUrl = "https://assets.mixkit.co/videos/preview/mixkit-ink-swirling-in-water-in-slow-motion-11911-large.mp4";
-      return {
-        success: true,
-        data: {
-          videoUrl: resultUrl,
-          resultUrl,
-          prompt,
-          type
-        }
-      };
-    }
     const errorText = await response.text();
     console.error("Fal.ai Video API Error:", errorText);
-    throw new Error(`Video generation failed: ${response.statusText}`);
+    
+    let errorMessage = "Video generation failed.";
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.detail || errorJson.message || errorMessage;
+    } catch (e) {}
+
+    throw new Error(`${errorMessage} (Status: ${response.status})`);
   }
 
   const result = await response.json();

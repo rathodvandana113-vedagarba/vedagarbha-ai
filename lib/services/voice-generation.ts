@@ -13,20 +13,7 @@ export async function generateVoice(text: string, voiceId?: string) {
   const apiKey = process.env.ELEVENLABS_API_KEY || process.env.VOICE_API_KEY;
 
   if (!apiKey) {
-    console.warn("[ELEVENLABS_API_KEY] NOT FOUND - FALLBACK TO MOCK");
-    // Simulate API delay
-    await new Promise(r => setTimeout(r, 1500));
-    const resultUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-    return {
-      success: true,
-      data: {
-        audioUrl: resultUrl, // Keep for backward compat
-        resultUrl,
-        text,
-        voiceId: voiceId || "rachel",
-        duration: Math.ceil(text.length / 15),
-      }
-    };
+    throw new Error("ELEVENLABS_API_KEY (VOICE_API_KEY) not found. Please add your ElevenLabs API key to environment variables.");
   }
 
   // ==== REAL INTEGRATION START ====
@@ -40,29 +27,26 @@ export async function generateVoice(text: string, voiceId?: string) {
     },
     body: JSON.stringify({
       text: text,
-      model_id: "eleven_monolingual_v1",
-      voice_settings: { stability: 0.5, similarity_boost: 0.5 }
+      model_id: "eleven_multilingual_v2", // Upgraded for much better quality and accuracy
+      voice_settings: { 
+        stability: 0.55, 
+        similarity_boost: 0.75,
+        use_speaker_boost: true
+      }
     })
   });
 
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403 || response.status === 402) {
-       console.warn("ElevenLabs API Key exhausted or unauthorized - FALLBACK TO MOCK");
-       const resultUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-       return {
-         success: true,
-         data: {
-           audioUrl: resultUrl,
-           resultUrl,
-           text,
-           voiceId: voiceId || "rachel",
-           duration: Math.ceil(text.length / 15),
-         }
-       };
-    }
     const errorText = await response.text();
     console.error("ElevenLabs API Error:", errorText);
-    throw new Error(`Voice generation failed: ${response.statusText}`);
+    
+    let errorMessage = "Voice generation failed.";
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.detail?.message || errorMessage;
+    } catch (e) {}
+
+    throw new Error(`${errorMessage} (Status: ${response.status})`);
   }
 
   // Convert binary audio buffer to Base64 data URL
