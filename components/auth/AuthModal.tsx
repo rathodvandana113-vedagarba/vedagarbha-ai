@@ -35,7 +35,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const handleSocialLogin = async (provider: 'google' | 'apple') => {
     setLoading(true);
     try {
-      const result = await signIn(provider, { callbackUrl: '/dashboard', redirect: false });
+      const result = await signIn(provider, { callbackUrl: '/dashboard' });
       if (result?.error) {
         if (result.error === "Configuration") {
           showToast(`Env Error: Please check your ${provider.toUpperCase()} keys in Vercel`, "error");
