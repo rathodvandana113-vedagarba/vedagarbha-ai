@@ -35,9 +35,16 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const handleSocialLogin = async (provider: 'google' | 'apple') => {
     setLoading(true);
     try {
-      await signIn(provider, { callbackUrl: '/dashboard' });
-    } catch (error) {
-      showToast(`${provider} login failed`);
+      const result = await signIn(provider, { callbackUrl: '/dashboard', redirect: false });
+      if (result?.error) {
+        if (result.error === "Configuration") {
+          showToast(`Env Error: Please check your ${provider.toUpperCase()} keys in Vercel`, "error");
+        } else {
+          throw new Error(result.error);
+        }
+      }
+    } catch (error: any) {
+      showToast(`${provider.toUpperCase()} Login Failed: ${error.message || "Unknown Error"}`);
     } finally {
       setLoading(false);
     }
@@ -117,7 +124,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             {tab === "login" ? "Welcome back" : tab === "signup" ? "Create account" : "Mobile Login"}
           </h2>
           <p className="mt-1 text-[11px] font-bold text-gray-500 uppercase tracking-widest text-center">
-            {tab === "signup" ? "Get free credits on sign up" : "Access your AI ecosystem"}
+            {tab === "phone" ? "Beta Simulation Mode: Use 123456" : tab === "signup" ? "Get free credits on sign up" : "Access your AI ecosystem"}
           </p>
         </div>
 
@@ -133,14 +140,16 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         <div className="px-8 pb-8">
           {/* Social Logins */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <button onClick={() => handleSocialLogin('google')} className="flex items-center justify-center gap-3 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <button onClick={() => handleSocialLogin('google')} className="flex items-center justify-center gap-3 py-3.5 rounded-xl bg-white/10 border border-white/10 hover:bg-white/20 transition-all group overflow-hidden">
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-4 h-4" alt="Google" />
-              <span className="text-[10px] font-bold text-white uppercase tracking-widest">Google</span>
+              <span className="text-[11px] font-black text-white uppercase tracking-widest">Google</span>
             </button>
-            <button onClick={() => handleSocialLogin('apple')} className="flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-black border border-white/10 hover:bg-gray-200 transition-all group">
-              <img src="https://www.svgrepo.com/show/452157/apple.svg" className="w-4 h-4 invert" alt="Apple" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">Apple</span>
+            <button onClick={() => handleSocialLogin('apple')} className="flex items-center justify-center gap-3 py-3.5 rounded-xl bg-white text-black hover:bg-gray-100 transition-all group overflow-hidden">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.062 13.917c.015 3.123 2.71 4.14 2.73 4.15-.022.072-.428 1.467-1.442 2.94-.877 1.272-1.788 2.54-3.208 2.566-1.396.026-1.847-.824-3.444-.824-1.6 0-2.098.803-3.418.853-1.373.05-2.404-1.37-3.287-2.642-1.808-2.61-3.19-7.37-1.32-10.612.928-1.61 2.585-2.616 4.385-2.642 1.373-.025 2.668.932 3.512.932.844 0 2.408-1.157 4.028-.992.678.028 2.583.272 3.805 2.062-.1-.06-.15.088-.15.424zM14.925 5.253c.71-.86 1.187-2.054 1.056-3.253-1.03.04-2.275.684-3.013 1.543-.66.758-1.238 1.968-1.082 3.142 1.15.088 2.328-.57 3.039-1.432z" />
+              </svg>
+              <span className="text-[11px] font-black uppercase tracking-widest">Apple</span>
             </button>
           </div>
 
@@ -189,7 +198,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             )}
             
             <button type="submit" disabled={loading}
-              className="w-full py-4 mt-4 font-black text-white transition-all bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 hover:border-white/40 active:scale-95 disabled:opacity-50 tracking-[0.2em] uppercase text-[10px] shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+              className="w-full py-4 mt-4 font-black text-black transition-all bg-white rounded-xl hover:bg-white/90 active:scale-95 disabled:opacity-50 tracking-[0.2em] uppercase text-[11px] shadow-[0_0_40px_rgba(255,255,255,0.3)]">
               {loading ? "AUTHENTICATING..." : tab === "phone" ? (otpSent ? "VERIFY OTP" : "SEND OTP") : (tab === "login" ? "LOG IN TO PLATFORM" : "INITIALIZE ACCOUNT")}
             </button>
           </form>
